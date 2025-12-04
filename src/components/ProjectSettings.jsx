@@ -229,6 +229,7 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
           {/* 完了ボタン（全タスク完了時のみ表示） */}
           {!loading && canComplete && (
             <button
+              type="button"
               onClick={handleComplete}
               style={{
                 padding: '12px 24px',
@@ -247,6 +248,7 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
 
           <div style={{ display: 'flex', gap: '10px' }}>
             <button
+              type="button"
               onClick={handleDelete}
               style={{
                 flex: 1,
@@ -262,6 +264,7 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
               削除
             </button>
             <button
+              type="button"
               onClick={handleArchive}
               style={{
                 flex: 1,
@@ -280,6 +283,7 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
 
           <div style={{ display: 'flex', gap: '10px' }}>
             <button
+              type="button"
               onClick={onClose}
               style={{
                 flex: 1,
@@ -295,6 +299,7 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
               キャンセル
             </button>
             <button
+              type="button"
               onClick={handleSave}
               style={{
                 flex: 1,

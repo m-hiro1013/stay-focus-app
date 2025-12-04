@@ -329,6 +329,7 @@ export default function Report({ teamId, onClose }) {
                   {/* ✅ 削除ボタン（タスクのみ） */}
                   {item.type === 'task' && (
                     <button
+                      type="button"
                       onClick={(e) => {
                         e.stopPropagation()
                         handleDeleteTask(item.id)

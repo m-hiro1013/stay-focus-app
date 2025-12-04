@@ -226,6 +226,7 @@ export default function MemberManagement({ teamId, onClose }) {
                   </div>
                 </div>
                 <button
+                  type="button"
                   onClick={() => deleteMember(member.id)}
                   style={{
                     padding: '6px 12px',
@@ -246,12 +247,13 @@ export default function MemberManagement({ teamId, onClose }) {
 
         {/* 閉じるボタン */}
         <button
+          type="button"
           onClick={onClose}
           style={{
             width: '100%',
             padding: '12px',
             backgroundColor: '#f0f0f0',
-            color: '#555',
+            color: '555',
             border: 'none',
             borderRadius: '8px',
             fontSize: '16px',

@@ -50,20 +50,23 @@ export default function ArchiveList({ teamId, onClose, onUpdate }) {  // ✅ onU
 
   // アーカイブを復元
   const unarchiveProject = async (projectId) => {
-    if (!confirm('このプロジェクトを復元するよん？')) return
+    if (!window.confirm('このプロジェクトを復元するよん？')) return
 
     const { error } = await supabase
       .from('projects')
       .update({ is_archived: false })
       .eq('id', projectId)
 
-    if (!error) {
-      alert('復元したよ！ホームで確認してねん！✨')
-      setArchivedProjects(archivedProjects.filter(p => p.id !== projectId))
-      if (onUpdate) onUpdate()  // ✅ 親コンポーネントのプロジェクト一覧を更新！
-    } else {
+    if (error) {
       alert('エラー: ' + error.message)
+      return
     }
+
+    alert('復元したよ！ホームで確認してねん！✨')
+    setTimeout(() => {
+      setArchivedProjects(archivedProjects.filter(p => p.id !== projectId))
+      if (onUpdate) onUpdate()
+    }, 100)
   }
 
   return (
@@ -90,14 +93,15 @@ export default function ArchiveList({ teamId, onClose, onUpdate }) {  // ✅ onU
         overflowY: 'auto',
         boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
       }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
           marginBottom: '20px'
         }}>
           <h2 style={{ margin: 0 }}>アーカイブ済みプロジェクト 📦</h2>
           <button
+            type="button"
             onClick={onClose}
             style={{
               padding: '8px 16px',
@@ -139,10 +143,10 @@ export default function ArchiveList({ teamId, onClose, onUpdate }) {  // ✅ onU
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}
               >
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center' 
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
                 }}>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '5px' }}>
@@ -155,6 +159,7 @@ export default function ArchiveList({ teamId, onClose, onUpdate }) {  // ✅ onU
                     )}
                   </div>
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation()
                       unarchiveProject(project.id)
@@ -201,8 +206,8 @@ export default function ArchiveList({ teamId, onClose, onUpdate }) {  // ✅ onU
                           gap: '8px'
                         }}
                       >
-                        <span style={{ 
-                          color: task.is_completed ? '#4CAF50' : '#999' 
+                        <span style={{
+                          color: task.is_completed ? '#4CAF50' : '#999'
                         }}>
                           {task.is_completed ? '✔' : '・'}
                         </span>

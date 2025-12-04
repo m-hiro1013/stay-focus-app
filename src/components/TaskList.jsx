@@ -201,6 +201,7 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
 
         {/* 削除ボタン */}
         <button
+          type="button"
           onClick={(e) => onDelete(task.id, e)}
           style={{
             padding: '8px 16px',
