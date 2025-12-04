@@ -15,7 +15,7 @@ export default function Report({ teamId, onClose }) {
   useEffect(() => {
     const today = new Date()
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
-    
+
     setStartDate(firstDay.toISOString().split('T')[0])
     setEndDate(today.toISOString().split('T')[0])
   }, [])
@@ -91,30 +91,36 @@ export default function Report({ teamId, onClose }) {
       })
       .eq('id', selectedTask.id)
 
-    if (!error) {
-      alert('保存したよ！✨')
+    if (error) {
+      alert('エラー: ' + error.message)
+      return
+    }
+
+    alert('保存したよ！✨')
+    setTimeout(() => {
       setSelectedTask(null)
       fetchReport()
-    } else {
-      alert('エラー: ' + error.message)
-    }
+    }, 100)
   }
 
   // ✅ タスク削除
   const handleDeleteTask = async (taskId) => {
-    if (!confirm('このタスクを削除するよん？\n振り返りコメントも一緒に消えちゃうよ！')) return
+    if (!window.confirm('このタスクを削除するよん？\n振り返りコメントも一緒に消えちゃうよ！')) return
 
     const { error } = await supabase
       .from('tasks')
       .delete()
       .eq('id', taskId)
 
-    if (!error) {
-      alert('削除したよ！🗑️')
-      fetchReport()
-    } else {
+    if (error) {
       alert('エラー: ' + error.message)
+      return
     }
+
+    alert('削除したよ！🗑️')
+    setTimeout(() => {
+      fetchReport()
+    }, 100)
   }
 
   return (
@@ -141,9 +147,9 @@ export default function Report({ teamId, onClose }) {
         overflowY: 'auto',
         boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
       }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
           marginBottom: '20px'
         }}>
@@ -164,9 +170,9 @@ export default function Report({ teamId, onClose }) {
         </div>
 
         {/* 期間選択 */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '10px', 
+        <div style={{
+          display: 'flex',
+          gap: '10px',
           alignItems: 'center',
           marginBottom: '20px'
         }}>
@@ -249,8 +255,8 @@ export default function Report({ teamId, onClose }) {
                   }}
                 >
                   {/* ✅ タスク情報エリア */}
-                  <div 
-                    style={{ 
+                  <div
+                    style={{
                       flex: 1,
                       cursor: item.type === 'task' ? 'pointer' : 'default'
                     }}
@@ -259,9 +265,9 @@ export default function Report({ teamId, onClose }) {
                     {item.type === 'project' ? (
                       // プロジェクト完了
                       <div>
-                        <div style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
                           gap: '8px',
                           marginBottom: '5px'
                         }}>
@@ -308,10 +314,10 @@ export default function Report({ teamId, onClose }) {
                             📝 {item.result_memo}
                           </div>
                         ) : (
-                          <div style={{ 
-                            marginTop: '8px', 
-                            fontSize: '12px', 
-                            color: '#ccc' 
+                          <div style={{
+                            marginTop: '8px',
+                            fontSize: '12px',
+                            color: '#ccc'
                           }}>
                             (結果を入力...)
                           </div>

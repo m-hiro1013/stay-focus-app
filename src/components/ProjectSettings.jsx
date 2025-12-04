@@ -9,8 +9,8 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
   const [loading, setLoading] = useState(true)
 
   const colors = [
-    '#FF69B4', '#FFB6C1', '#87CEEB', '#4682B4', 
-    '#90EE90', '#32CD32', '#FFD700', '#FFA500', 
+    '#FF69B4', '#FFB6C1', '#87CEEB', '#4682B4',
+    '#90EE90', '#32CD32', '#FFD700', '#FFA500',
     '#D3D3D3', '#A9A9A9'
   ]
 
@@ -45,18 +45,21 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
       })
       .eq('id', project.id)
 
-    if (!error) {
-      alert('保存したよ！✨')
+    if (error) {
+      alert('エラー: ' + error.message)
+      return
+    }
+
+    alert('保存したよ！✨')
+    setTimeout(() => {
       onUpdate()
       onClose()
-    } else {
-      alert('エラー: ' + error.message)
-    }
+    }, 100)
   }
 
   // プロジェクト完了
   const handleComplete = async () => {
-    if (!confirm('このプロジェクトを完了にするよん？🎉')) return
+    if (!window.confirm('このプロジェクトを完了にするよん？🎉')) return
 
     const { error } = await supabase
       .from('projects')
@@ -66,36 +69,42 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
       })
       .eq('id', project.id)
 
-    if (!error) {
-      alert('お疲れ様！プロジェクト完了だよん！🎉')
+    if (error) {
+      alert('エラー: ' + error.message)
+      return
+    }
+
+    alert('お疲れ様！プロジェクト完了だよん！🎉')
+    setTimeout(() => {
       onUpdate()
       onClose()
-    } else {
-      alert('エラー: ' + error.message)
-    }
+    }, 100)
   }
 
   // アーカイブ
   const handleArchive = async () => {
-    if (!confirm('このプロジェクトをアーカイブするよん？📦')) return
+    if (!window.confirm('このプロジェクトをアーカイブするよん？📦')) return
 
     const { error } = await supabase
       .from('projects')
       .update({ is_archived: true })
       .eq('id', project.id)
 
-    if (!error) {
-      alert('アーカイブしたよ！📦')
+    if (error) {
+      alert('エラー: ' + error.message)
+      return
+    }
+
+    alert('アーカイブしたよ！📦')
+    setTimeout(() => {
       onUpdate()
       onClose()
-    } else {
-      alert('エラー: ' + error.message)
-    }
+    }, 100)
   }
 
   // 削除
   const handleDelete = async () => {
-    if (!confirm('マジで削除する？タスクも全部消えるよん！')) return
+    if (!window.confirm('マジで削除する？タスクも全部消えるよん！')) return
 
     // プロジェクトに紐づくタスクを削除
     await supabase
@@ -109,13 +118,16 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
       .delete()
       .eq('id', project.id)
 
-    if (!error) {
-      alert('削除したよん！🗑️')
+    if (error) {
+      alert('エラー: ' + error.message)
+      return
+    }
+
+    alert('削除したよん！🗑️')
+    setTimeout(() => {
       onUpdate()
       onClose()
-    } else {
-      alert('エラー: ' + error.message)
-    }
+    }, 100)
   }
 
   return (
@@ -209,8 +221,8 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
         </div>
 
         {/* ボタン */}
-        <div style={{ 
-          display: 'flex', 
+        <div style={{
+          display: 'flex',
           flexDirection: 'column',
           gap: '10px'
         }}>

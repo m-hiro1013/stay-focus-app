@@ -8,8 +8,8 @@ export default function MemberManagement({ teamId, onClose }) {
   const [newMemberColor, setNewMemberColor] = useState('#FF69B4')
 
   const colors = [
-    '#FF69B4', '#FFB6C1', '#87CEEB', '#4682B4', 
-    '#90EE90', '#32CD32', '#FFD700', '#FFA500', 
+    '#FF69B4', '#FFB6C1', '#87CEEB', '#4682B4',
+    '#90EE90', '#32CD32', '#FFD700', '#FFA500',
     '#D3D3D3', '#A9A9A9'
   ]
 
@@ -45,30 +45,40 @@ export default function MemberManagement({ teamId, onClose }) {
       })
       .select()
 
-    if (data) {
-      setMembers([...members, data[0]])
-      setNewMemberName('')
-      setNewMemberEmail('')
-      setNewMemberColor('#FF69B4')
-      alert('メンバー追加したよ！👥')
-    } else {
+    if (error) {
       alert('エラー: ' + error.message)
+      return
+    }
+
+    if (data) {
+      alert('メンバー追加したよ！👥')
+      setTimeout(() => {
+        setMembers([...members, data[0]])
+        setNewMemberName('')
+        setNewMemberEmail('')
+        setNewMemberColor('#FF69B4')
+      }, 100)
     }
   }
 
   // メンバー削除
   const deleteMember = async (memberId) => {
-    if (!confirm('このメンバーを削除する？')) return
+    if (!window.confirm('このメンバーを削除する？')) return
 
     const { error } = await supabase
       .from('members')
       .delete()
       .eq('id', memberId)
 
-    if (!error) {
-      setMembers(members.filter(m => m.id !== memberId))
-      alert('削除したよ！')
+    if (error) {
+      alert('エラー: ' + error.message)
+      return
     }
+
+    alert('削除したよ！')
+    setTimeout(() => {
+      setMembers(members.filter(m => m.id !== memberId))
+    }, 100)
   }
 
   return (

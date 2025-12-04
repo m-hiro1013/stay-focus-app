@@ -74,31 +74,31 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
         </span>
 
         {/* ピン留めアイコン（クリック可能） */}
-        <span 
-        onClick={(e) => {
+        <span
+          onClick={(e) => {
             e.stopPropagation()
             onTogglePin(task.id, task.is_pinned)
-        }}
-        style={{ 
+          }}
+          style={{
             fontSize: '18px',
             cursor: 'pointer',
             opacity: task.is_pinned ? 1 : 0.3,
             filter: task.is_pinned ? 'none' : 'grayscale(100%)',
             transition: 'all 0.2s',
             userSelect: 'none'
-        }}
-        title={task.is_pinned ? 'ピン留め解除' : 'ピン留め'}
+          }}
+          title={task.is_pinned ? 'ピン留め解除' : 'ピン留め'}
         >
-        📌
+          📌
         </span>
 
         {/* 重要マーク（クリック可能） */}
-        <span 
+        <span
           onClick={(e) => {
             e.stopPropagation()
             onToggleImportant(task.id, task.is_important)
           }}
-          style={{ 
+          style={{
             fontSize: '20px',
             cursor: 'pointer',
             color: task.is_important ? '#FFD700' : '#e0e0e0',
@@ -125,9 +125,9 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
 
         {/* タスク情報 */}
         <div style={{ flex: 1 }}>
-          <div style={{ 
-            fontWeight: 'bold', 
-            fontSize: '16px', 
+          <div style={{
+            fontWeight: 'bold',
+            fontSize: '16px',
             marginBottom: '4px',
             color: hasWarning ? '#d9534f' : 'inherit',
             display: 'flex',
@@ -135,14 +135,14 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
             gap: '8px'
           }}>
             {hasWarning && (
-              <span 
-                style={{ 
+              <span
+                style={{
                   fontSize: '18px',
                   animation: 'pulse 1.5s ease-in-out infinite'
                 }}
                 title={
-                  isOverdue 
-                    ? '⚠️ 期日が過ぎています！' 
+                  isOverdue
+                    ? '⚠️ 期日が過ぎています！'
                     : '⚠️ 期日が近いのに遠い時間枠に入っています！'
                 }
               >
@@ -154,9 +154,9 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
 
           {/* 担当者表示 */}
           {assignees.length > 0 && (
-            <div style={{ 
-              display: 'flex', 
-              gap: '5px', 
+            <div style={{
+              display: 'flex',
+              gap: '5px',
               marginBottom: '4px',
               flexWrap: 'wrap'
             }}>
@@ -189,8 +189,8 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
             </div>
           )}
           {task.due_date && (
-            <div style={{ 
-              fontSize: '12px', 
+            <div style={{
+              fontSize: '12px',
               color: hasWarning ? '#d9534f' : '#999',
               fontWeight: hasWarning ? 'bold' : 'normal'
             }}>
@@ -232,10 +232,10 @@ function DroppableTimeFrame({ timeFrame, tasks, assignees, onToggle, onDelete, o
         strategy={verticalListSortingStrategy}
       >
         {tasks.length === 0 ? (
-          <div style={{ 
-            padding: '40px 20px', 
-            textAlign: 'center', 
-            color: '#999', 
+          <div style={{
+            padding: '40px 20px',
+            textAlign: 'center',
+            color: '#999',
             fontSize: '14px',
             backgroundColor: '#fafafa',
             border: '2px dashed #e0e0e0',
@@ -303,7 +303,7 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     // ✅ 日付のみで比較（時刻を無視）
     const now = new Date()
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-    
+
     // ✅ 期日も0時にリセット
     const dueDateParts = task.due_date.split('-')
     const dueDate = new Date(
@@ -435,11 +435,11 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     fetchTasks()
   }, [teamId, currentProject])
 
-// タスク作成フォーム送信（モーダルを開く）
-const handleTaskInputSubmit = (e) => {
+  // タスク作成フォーム送信（モーダルを開く）
+  const handleTaskInputSubmit = (e) => {
     e.preventDefault()
     if (!newTaskName.trim()) return
-  
+
     setNewTaskData({
       task_name: newTaskName,
       memo: '',
@@ -452,7 +452,7 @@ const handleTaskInputSubmit = (e) => {
     })
     setShowCreateModal(true)
   }
-  
+
 
   // タスク作成（モーダルから保存）
   const createTask = async () => {
@@ -476,24 +476,29 @@ const handleTaskInputSubmit = (e) => {
       })
       .select()
 
-    if (data) {
-      setTasks([...tasks, data[0]])
-      setNewTaskName('')
-      setNewTaskData({
-        task_name: '',
-        memo: '',
-        due_date: '',
-        due_time: '',
-        priority_time_frame: '今日',
-        is_important: false,
-        is_pinned: false,
-        assignees: []
-      })
-      setShowCreateModal(false)
-      alert('タスク作成したよ！✨')
-      fetchTasks()
-    } else {
+    if (error) {
       alert('エラー: ' + error.message)
+      return
+    }
+
+    if (data) {
+      alert('タスク作成したよ！✨')
+      setTimeout(() => {
+        setTasks([...tasks, data[0]])
+        setNewTaskName('')
+        setNewTaskData({
+          task_name: '',
+          memo: '',
+          due_date: '',
+          due_time: '',
+          priority_time_frame: '今日',
+          is_important: false,
+          is_pinned: false,
+          assignees: []
+        })
+        setShowCreateModal(false)
+        fetchTasks()
+      }, 100)
     }
   }
 
@@ -530,8 +535,8 @@ const handleTaskInputSubmit = (e) => {
 
   // 重要マークの切り替え
   const toggleImportant = async (taskId, isImportant) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId 
+    setTasks(tasks.map(task =>
+      task.id === taskId
         ? { ...task, is_important: !isImportant }
         : task
     ).sort((a, b) => {
@@ -553,8 +558,8 @@ const handleTaskInputSubmit = (e) => {
 
   // ピン留めの切り替え
   const togglePin = async (taskId, isPinned) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId 
+    setTasks(tasks.map(task =>
+      task.id === taskId
         ? { ...task, is_pinned: !isPinned }
         : task
     ).sort((a, b) => {
@@ -577,18 +582,23 @@ const handleTaskInputSubmit = (e) => {
   // タスク削除
   const deleteTask = async (taskId, e) => {
     e.stopPropagation()
-    
-    if (!confirm('本当に削除する？')) return
+
+    if (!window.confirm('本当に削除する？')) return
 
     const { error } = await supabase
       .from('tasks')
       .delete()
       .eq('id', taskId)
 
-    if (!error) {
-      setTasks(tasks.filter(task => task.id !== taskId))
-      alert('削除したよ！🗑️')
+    if (error) {
+      alert('エラー: ' + error.message)
+      return
     }
+
+    alert('削除したよ！🗑️')
+    setTimeout(() => {
+      setTasks(tasks.filter(task => task.id !== taskId))
+    }, 100)
   }
 
   // 担当者名を取得
@@ -596,7 +606,7 @@ const handleTaskInputSubmit = (e) => {
     try {
       const assigneeIds = JSON.parse(assigneesJson || '[]')
       if (assigneeIds.length === 0) return []
-      
+
       return assigneeIds.map(id => {
         const member = members.find(m => m.id === id)
         return member ? { name: member.name, color: member.color } : null
@@ -635,7 +645,7 @@ const handleTaskInputSubmit = (e) => {
     if (!activeTask) return
 
     let targetTimeFrame = null
-    
+
     if (over.id.toString().startsWith('group-')) {
       targetTimeFrame = over.id.toString().replace('group-', '')
     } else {
@@ -761,10 +771,10 @@ const handleTaskInputSubmit = (e) => {
           alignItems: 'center'
         }}>
           <span>💡 間違えた？ <strong>Command + Z</strong>（Ctrl + Z）で戻せるよ！</span>
-          <span style={{ 
-            backgroundColor: '#ffc107', 
-            color: 'white', 
-            padding: '2px 8px', 
+          <span style={{
+            backgroundColor: '#ffc107',
+            color: 'white',
+            padding: '2px 8px',
             borderRadius: '10px',
             fontSize: '11px'
           }}>
@@ -957,74 +967,74 @@ const handleTaskInputSubmit = (e) => {
               </select>
             </div>
 
-{/* 期日 */}
-<div style={{ marginBottom: '20px' }}>
-  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-    期日
-  </label>
-  <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-    <input
-      type="date"
-      value={newTaskData.due_date}
-      onChange={(e) => setNewTaskData({ ...newTaskData, due_date: e.target.value })}
-      style={{
-        flex: 1,
-        padding: '12px',
-        border: '1px solid #ddd',
-        borderRadius: '8px',
-        fontSize: '16px'
-      }}
-    />
-    <select
-      value={newTaskData.due_time}
-      onChange={(e) => setNewTaskData({ ...newTaskData, due_time: e.target.value })}
-      onFocus={(e) => {
-        // ✅ 初回クリック時のみ、空なら17:00にする
-        if (newTaskData.due_time === '') {
-          setNewTaskData({ ...newTaskData, due_time: '17:00' })
-        }
-      }}
-      style={{
-        flex: 1,
-        padding: '12px',
-        border: '1px solid #ddd',
-        borderRadius: '8px',
-        fontSize: '16px',
-        backgroundColor: 'white'
-      }}
-    >
-      <option value="">時間なし</option>
-      {Array.from({ length: 48 }, (_, i) => {
-        const hour = Math.floor(i / 2)
-        const minute = (i % 2) * 30
-        const timeValue = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
-        return (
-          <option key={timeValue} value={timeValue}>
-            {timeValue}
-          </option>
-        )
-      })}
-    </select>
-  </div>
-  {(newTaskData.due_date || newTaskData.due_time) && (
-    <button
-      type="button"
-      onClick={() => setNewTaskData({ ...newTaskData, due_date: '', due_time: '' })}
-      style={{
-        padding: '8px 16px',
-        backgroundColor: '#f0f0f0',
-        color: '#666',
-        border: '1px solid #ddd',
-        borderRadius: '8px',
-        cursor: 'pointer',
-        fontSize: '14px',
-        width: '100%'
-      }}
-    >
-      🗑️ 期日をクリア
-    </button>
-  )}
-</div>
+            {/* 期日 */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                期日
+              </label>
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                <input
+                  type="date"
+                  value={newTaskData.due_date}
+                  onChange={(e) => setNewTaskData({ ...newTaskData, due_date: e.target.value })}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '8px',
+                    fontSize: '16px'
+                  }}
+                />
+                <select
+                  value={newTaskData.due_time}
+                  onChange={(e) => setNewTaskData({ ...newTaskData, due_time: e.target.value })}
+                  onFocus={(e) => {
+                    // ✅ 初回クリック時のみ、空なら17:00にする
+                    if (newTaskData.due_time === '') {
+                      setNewTaskData({ ...newTaskData, due_time: '17:00' })
+                    }
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    backgroundColor: 'white'
+                  }}
+                >
+                  <option value="">時間なし</option>
+                  {Array.from({ length: 48 }, (_, i) => {
+                    const hour = Math.floor(i / 2)
+                    const minute = (i % 2) * 30
+                    const timeValue = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+                    return (
+                      <option key={timeValue} value={timeValue}>
+                        {timeValue}
+                      </option>
+                    )
+                  })}
+                </select>
+              </div>
+              {(newTaskData.due_date || newTaskData.due_time) && (
+                <button
+                  type="button"
+                  onClick={() => setNewTaskData({ ...newTaskData, due_date: '', due_time: '' })}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: '#f0f0f0',
+                    color: '#666',
+                    border: '1px solid #ddd',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    width: '100%'
+                  }}
+                >
+                  🗑️ 期日をクリア
+                </button>
+              )}
+            </div>
 
             {/* 重要マーク・ピン留め */}
             <div style={{ marginBottom: '20px', display: 'flex', gap: '20px' }}>
@@ -1079,14 +1089,14 @@ const handleTaskInputSubmit = (e) => {
                         checked={newTaskData.assignees.includes(member.id)}
                         onChange={(e) => {
                           if (e.target.checked) {
-                            setNewTaskData({ 
-                              ...newTaskData, 
-                              assignees: [...newTaskData.assignees, member.id] 
+                            setNewTaskData({
+                              ...newTaskData,
+                              assignees: [...newTaskData.assignees, member.id]
                             })
                           } else {
-                            setNewTaskData({ 
-                              ...newTaskData, 
-                              assignees: newTaskData.assignees.filter(id => id !== member.id) 
+                            setNewTaskData({
+                              ...newTaskData,
+                              assignees: newTaskData.assignees.filter(id => id !== member.id)
                             })
                           }
                         }}
