@@ -113,11 +113,11 @@ function App() {
       justifyContent: 'center',
       padding: '20px'
     }}>
-      
-        <div style={{
-          width: '80%',
-          maxWidth: '1600px'
-        }}>
+
+      <div style={{
+        width: '80%',
+        maxWidth: '1600px'
+      }}>
 
         {/* ヘッダー */}
         <div style={{
@@ -127,7 +127,7 @@ function App() {
           marginBottom: '30px'
         }}>
           <h1 style={{ color: '#ff69b4', margin: 0 }}>stay-focus 🔥</h1>
-          
+
           <div style={{ display: 'flex', gap: '10px' }}>
             {/* プロジェクト設定ボタン（プロジェクト選択時のみ表示） */}
             {currentProject && (
@@ -148,7 +148,7 @@ function App() {
                 ⚙️ プロジェクト設定
               </button>
             )}
-            
+
             <button
               onClick={() => setShowArchive(true)}
               style={{
@@ -165,7 +165,7 @@ function App() {
             >
               📦 アーカイブ
             </button>
-            
+
             <button
               onClick={() => setShowReport(true)}
               style={{
@@ -182,7 +182,7 @@ function App() {
             >
               📊 レポート
             </button>
-            
+
             <button
               onClick={() => setShowMemberManagement(true)}
               style={{
@@ -199,11 +199,14 @@ function App() {
             >
               👥 メンバー管理
             </button>
-            
+
             <button
               onClick={async () => {
+                const confirmed = window.confirm('ログアウトしますか？')
+                if (!confirmed) return
+
                 await supabase.auth.signOut()
-                alert('ログアウトしたよ！👋')
+                // アラートは不要（ログイン画面に遷移するため）
               }}
               style={{
                 padding: '10px 20px',
@@ -227,7 +230,7 @@ function App() {
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
         }}>
           {/* プロジェクトタブ */}
-          <ProjectList 
+          <ProjectList
             teamId={teamId}
             currentProject={currentProject}
             onProjectChange={setCurrentProject}
@@ -256,7 +259,7 @@ function App() {
           <h2 style={{ marginTop: 0, marginBottom: '20px' }}>
             {currentProject ? 'プロジェクトのタスク' : 'すべてのタスク'} 📝
           </h2>
-          <TaskList 
+          <TaskList
             session={session}
             teamId={teamId}
             currentProject={currentProject}
