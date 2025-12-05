@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
+import ConfirmModal from './ConfirmModal'
 
 export default function ProjectSettings({ project, teamId, onClose, onUpdate }) {
   const [projectName, setProjectName] = useState(project.project_name)
@@ -7,10 +8,11 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
   const [colorCode, setColorCode] = useState(project.color_code)
   const [canComplete, setCanComplete] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const colors = [
-    '#FF69B4', '#FFB6C1', '#87CEEB', '#4682B4', 
-    '#90EE90', '#32CD32', '#FFD700', '#FFA500', 
+    '#FF69B4', '#FFB6C1', '#87CEEB', '#4682B4',
+    '#90EE90', '#32CD32', '#FFD700', '#FFA500',
     '#D3D3D3', '#A9A9A9'
   ]
 
@@ -45,18 +47,21 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
       })
       .eq('id', project.id)
 
-    if (!error) {
-      alert('保存したよ！✨')
+    if (error) {
+      alert('エラー: ' + error.message)
+      return
+    }
+
+    alert('保存したよ！✨')
+    setTimeout(() => {
       onUpdate()
       onClose()
-    } else {
-      alert('エラー: ' + error.message)
-    }
+    }, 100)
   }
 
   // プロジェクト完了
   const handleComplete = async () => {
-    if (!confirm('このプロジェクトを完了にするよん？🎉')) return
+    if (!window.confirm('このプロジェクトを完了にするよん？🎉')) return
 
     const { error } = await supabase
       .from('projects')
@@ -66,36 +71,46 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
       })
       .eq('id', project.id)
 
-    if (!error) {
-      alert('お疲れ様！プロジェクト完了だよん！🎉')
+    if (error) {
+      alert('エラー: ' + error.message)
+      return
+    }
+
+    alert('お疲れ様！プロジェクト完了だよん！🎉')
+    setTimeout(() => {
       onUpdate()
       onClose()
-    } else {
-      alert('エラー: ' + error.message)
-    }
+    }, 100)
   }
 
   // アーカイブ
   const handleArchive = async () => {
-    if (!confirm('このプロジェクトをアーカイブするよん？📦')) return
+    if (!window.confirm('このプロジェクトをアーカイブするよん？📦')) return
 
     const { error } = await supabase
       .from('projects')
       .update({ is_archived: true })
       .eq('id', project.id)
 
-    if (!error) {
-      alert('アーカイブしたよ！📦')
+    if (error) {
+      alert('エラー: ' + error.message)
+      return
+    }
+
+    alert('アーカイブしたよ！📦')
+    setTimeout(() => {
       onUpdate()
       onClose()
-    } else {
-      alert('エラー: ' + error.message)
-    }
+    }, 100)
   }
 
   // 削除
   const handleDelete = async () => {
-    if (!confirm('マジで削除する？タスクも全部消えるよん！')) return
+    setShowDeleteConfirm(true)
+  }
+
+  const executeDelete = async () => {
+    setShowDeleteConfirm(false)
 
     // プロジェクトに紐づくタスクを削除
     await supabase
@@ -109,197 +124,216 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
       .delete()
       .eq('id', project.id)
 
-    if (!error) {
-      alert('削除したよん！🗑️')
+    if (error) {
+      alert('エラー: ' + error.message)
+      return
+    }
+
+    alert('削除したよん！🗑️')
+    setTimeout(() => {
       onUpdate()
       onClose()
-    } else {
-      alert('エラー: ' + error.message)
-    }
+    }, 100)
   }
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 1000,
-      padding: '20px'
-    }}>
+    <>
       <div style={{
-        backgroundColor: 'white',
-        padding: '30px',
-        borderRadius: '16px',
-        width: '90%',
-        maxWidth: '500px',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000,
+        padding: '20px'
       }}>
-        <h2 style={{ marginTop: 0, marginBottom: '20px' }}>プロジェクト設定 ⚙️</h2>
-
-        {/* プロジェクト名 */}
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-            プロジェクト名
-          </label>
-          <input
-            type="text"
-            value={projectName}
-            onChange={(e) => setProjectName(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              fontSize: '16px',
-              boxSizing: 'border-box'
-            }}
-          />
-        </div>
-
-        {/* 概要 */}
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-            概要
-          </label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows="3"
-            placeholder="プロジェクトの説明..."
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              fontSize: '16px',
-              boxSizing: 'border-box',
-              resize: 'vertical'
-            }}
-          />
-        </div>
-
-        {/* 色 */}
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-            色
-          </label>
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            {colors.map(color => (
-              <div
-                key={color}
-                onClick={() => setColorCode(color)}
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  backgroundColor: color,
-                  borderRadius: '50%',
-                  cursor: 'pointer',
-                  border: colorCode === color ? '3px solid #333' : '3px solid white',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                }}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* ボタン */}
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column',
-          gap: '10px'
+        <div style={{
+          backgroundColor: 'white',
+          padding: '30px',
+          borderRadius: '16px',
+          width: '90%',
+          maxWidth: '500px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
         }}>
-          {/* 完了ボタン（全タスク完了時のみ表示） */}
-          {!loading && canComplete && (
-            <button
-              onClick={handleComplete}
-              style={{
-                padding: '12px 24px',
-                backgroundColor: '#4CAF50',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                fontSize: '16px'
-              }}
-            >
-              ✅ プロジェクト完了
-            </button>
-          )}
+          <h2 style={{ marginTop: 0, marginBottom: '20px' }}>プロジェクト設定 ⚙️</h2>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              onClick={handleDelete}
+          {/* プロジェクト名 */}
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+              プロジェクト名
+            </label>
+            <input
+              type="text"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
               style={{
-                flex: 1,
-                padding: '12px 24px',
-                backgroundColor: 'white',
-                color: '#ff4d4d',
-                border: '1px solid #ff4d4d',
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #ddd',
                 borderRadius: '8px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
+                fontSize: '16px',
+                boxSizing: 'border-box'
               }}
-            >
-              削除
-            </button>
-            <button
-              onClick={handleArchive}
-              style={{
-                flex: 1,
-                padding: '12px 24px',
-                backgroundColor: '#FF9800',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
-            >
-              📦 アーカイブ
-            </button>
+            />
           </div>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              onClick={onClose}
+          {/* 概要 */}
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+              概要
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows="3"
+              placeholder="プロジェクトの説明..."
               style={{
-                flex: 1,
-                padding: '12px 24px',
-                backgroundColor: '#f0f0f0',
-                color: '#555',
-                border: 'none',
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #ddd',
                 borderRadius: '8px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
+                fontSize: '16px',
+                boxSizing: 'border-box',
+                resize: 'vertical'
               }}
-            >
-              キャンセル
-            </button>
-            <button
-              onClick={handleSave}
-              style={{
-                flex: 1,
-                padding: '12px 24px',
-                backgroundColor: '#ff69b4',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
-            >
-              保存
-            </button>
+            />
+          </div>
+
+          {/* 色 */}
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+              色
+            </label>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              {colors.map(color => (
+                <div
+                  key={color}
+                  onClick={() => setColorCode(color)}
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    backgroundColor: color,
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    border: colorCode === color ? '3px solid #333' : '3px solid white',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* ボタン */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px'
+          }}>
+            {/* 完了ボタン（全タスク完了時のみ表示） */}
+            {!loading && canComplete && (
+              <button
+                type="button"
+                onClick={handleComplete}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '16px'
+                }}
+              >
+                ✅ プロジェクト完了
+              </button>
+            )}
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={handleDelete}
+                style={{
+                  flex: 1,
+                  padding: '12px 24px',
+                  backgroundColor: 'white',
+                  color: '#ff4d4d',
+                  border: '1px solid #ff4d4d',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold'
+                }}
+              >
+                削除
+              </button>
+              <button
+                type="button"
+                onClick={handleArchive}
+                style={{
+                  flex: 1,
+                  padding: '12px 24px',
+                  backgroundColor: '#FF9800',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold'
+                }}
+              >
+                📦 アーカイブ
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={onClose}
+                style={{
+                  flex: 1,
+                  padding: '12px 24px',
+                  backgroundColor: '#f0f0f0',
+                  color: '#555',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold'
+                }}
+              >
+                キャンセル
+              </button>
+              <button
+                type="button"
+                onClick={handleSave}
+                style={{
+                  flex: 1,
+                  padding: '12px 24px',
+                  backgroundColor: '#ff69b4',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold'
+                }}
+              >
+                保存
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* 確認モーダル */}
+      {showDeleteConfirm && (
+        <ConfirmModal
+          message="マジで削除する？タスクも全部消えるよん！🗑️"
+          onConfirm={executeDelete}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
+      )}
+    </>
   )
 }
