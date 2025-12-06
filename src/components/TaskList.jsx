@@ -20,7 +20,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 
 // ドラッグ可能なタスクカードコンポーネント
-function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projectColor, onToggleImportant, onTogglePin, checkTaskStatus }) {
+function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projectColor, onToggleImportant, onTogglePin, checkTaskStatus, isMobile }) {
   const {
     attributes,
     listeners,
@@ -51,8 +51,8 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '15px',
-        padding: '15px',
+        gap: isMobile ? '8px' : '15px', // 🔥 スマホは間隔小さく
+        padding: isMobile ? '12px 8px' : '15px',
         borderBottom: '1px solid #f0f0f0',
         cursor: 'pointer',
         borderLeft: projectColor ? `5px solid ${projectColor}` : 'none',
@@ -65,7 +65,7 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
           {...listeners}
           style={{
             cursor: 'grab',
-            fontSize: '20px',
+            fontSize: isMobile ? '16px' : '20px',
             color: '#999',
             touchAction: 'none'
           }}
@@ -80,7 +80,7 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
             onTogglePin(task.id, task.is_pinned)
           }}
           style={{
-            fontSize: '18px',
+            fontSize: isMobile ? '14px' : '18px',
             cursor: 'pointer',
             opacity: task.is_pinned ? 1 : 0.3,
             filter: task.is_pinned ? 'none' : 'grayscale(100%)',
@@ -99,7 +99,7 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
             onToggleImportant(task.id, task.is_important)
           }}
           style={{
-            fontSize: '20px',
+            fontSize: isMobile ? '16px' : '20px',
             cursor: 'pointer',
             color: task.is_important ? '#FFD700' : '#e0e0e0',
             transition: 'color 0.2s',
@@ -117,28 +117,30 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
           onChange={(e) => onToggle(task.id, task.is_completed, e)}
           onClick={(e) => e.stopPropagation()}
           style={{
-            width: '20px',
-            height: '20px',
+            width: isMobile ? '18px' : '20px',
+            height: isMobile ? '18px' : '20px',
             cursor: 'pointer'
           }}
         />
 
         {/* タスク情報 */}
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minWidth: 0 }}> {/* 🔥 minWidth: 0 でテキストの折り返しを強制 */}
           <div style={{
             fontWeight: 'bold',
-            fontSize: '16px',
+            fontSize: isMobile ? '15px' : '16px', // 🔥 スマホはタイトルを大きく
             marginBottom: '4px',
             color: hasWarning ? '#d9534f' : 'inherit',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '8px',
+            wordBreak: 'break-word' // 🔥 長いタスク名を折り返す
           }}>
             {hasWarning && (
               <span
                 style={{
-                  fontSize: '18px',
-                  animation: 'pulse 1.5s ease-in-out infinite'
+                  fontSize: isMobile ? '16px' : '18px',
+                  animation: 'pulse 1.5s ease-in-out infinite',
+                  flexShrink: 0 // 🔥 アイコンは縮小させない
                 }}
                 title={
                   isOverdue
@@ -162,7 +164,7 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
             }}>
               {assignees.map((assignee, index) => (
                 <span key={index} style={{
-                  fontSize: '11px',
+                  fontSize: isMobile ? '10px' : '11px',
                   padding: '2px 8px',
                   backgroundColor: '#f0f0f0',
                   borderRadius: '10px',
@@ -184,13 +186,18 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
           )}
 
           {task.memo && (
-            <div style={{ fontSize: '13px', color: '#666', marginBottom: '4px' }}>
+            <div style={{
+              fontSize: isMobile ? '12px' : '13px',
+              color: '#666',
+              marginBottom: '4px',
+              wordBreak: 'break-word' // 🔥 メモも折り返す
+            }}>
               {task.memo}
             </div>
           )}
           {task.due_date && (
             <div style={{
-              fontSize: '12px',
+              fontSize: isMobile ? '11px' : '12px',
               color: hasWarning ? '#d9534f' : '#999',
               fontWeight: hasWarning ? 'bold' : 'normal'
             }}>
@@ -199,21 +206,22 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
           )}
         </div>
 
-        {/* 削除ボタン */}
+        {/* 🔥 削除ボタン（スマホではシンプルなアイコンに） */}
         <button
           type="button"
           onClick={(e) => onDelete(task.id, e)}
           style={{
-            padding: '8px 16px',
-            backgroundColor: '#ff4d4d',
-            color: 'white',
+            padding: isMobile ? '6px' : '8px 16px',
+            backgroundColor: isMobile ? 'transparent' : '#ff4d4d',
+            color: isMobile ? '#999' : 'white',
             border: 'none',
             borderRadius: '6px',
             cursor: 'pointer',
-            fontSize: '14px'
+            fontSize: isMobile ? '18px' : '14px',
+            flexShrink: 0 // 🔥 削除ボタンは縮小させない
           }}
         >
-          削除
+          {isMobile ? '🗑️' : '削除'}
         </button>
       </div>
     </div>
@@ -221,7 +229,7 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
 }
 
 // ドロップ可能なグループコンテナ
-function DroppableTimeFrame({ timeFrame, tasks, assignees, onToggle, onDelete, onClick, getProjectColor, onToggleImportant, onTogglePin, checkTaskStatus }) {
+function DroppableTimeFrame({ timeFrame, tasks, assignees, onToggle, onDelete, onClick, getProjectColor, onToggleImportant, onTogglePin, checkTaskStatus, isMobile }) {
   const {
     setNodeRef,
   } = useSortable({ id: `group-${timeFrame}` })
@@ -257,6 +265,7 @@ function DroppableTimeFrame({ timeFrame, tasks, assignees, onToggle, onDelete, o
               onToggleImportant={onToggleImportant}
               onTogglePin={onTogglePin}
               checkTaskStatus={checkTaskStatus}
+              isMobile={isMobile} // 🔥 追加
             />
           ))
         )}
@@ -265,7 +274,7 @@ function DroppableTimeFrame({ timeFrame, tasks, assignees, onToggle, onDelete, o
   )
 }
 
-export default function TaskList({ session, teamId, currentProject, projects }) {
+export default function TaskList({ session, teamId, currentProject, projects, isMobile }) {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [newTaskName, setNewTaskName] = useState('')
@@ -841,6 +850,7 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
                     onToggleImportant={toggleImportant}
                     onTogglePin={togglePin}
                     checkTaskStatus={checkTaskStatus}
+                    isMobile={isMobile} // 🔥 追加
                   />
                 </div>
               </div>

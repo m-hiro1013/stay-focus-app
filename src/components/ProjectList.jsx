@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
 
-export default function ProjectList({ teamId, currentProject, onProjectChange, projects, onUpdate }) {
+export default function ProjectList({ teamId, currentProject, onProjectChange, projects, onUpdate, isMobile }) {
   const [showModal, setShowModal] = useState(false)
   const [newProjectName, setNewProjectName] = useState('')
   const [newProjectDesc, setNewProjectDesc] = useState('')
   const [newProjectColor, setNewProjectColor] = useState('#FF69B4')
 
   const colors = [
-    '#FF69B4', '#FFB6C1', '#87CEEB', '#4682B4', 
-    '#90EE90', '#32CD32', '#FFD700', '#FFA500', 
+    '#FF69B4', '#FFB6C1', '#87CEEB', '#4682B4',
+    '#90EE90', '#32CD32', '#FFD700', '#FFA500',
     '#D3D3D3', '#A9A9A9'
   ]
 
