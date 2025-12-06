@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>オフライン - Stay Focus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        h1 {
+            color: #ff69b4;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #ff69b4;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+        }
+
+        .button:hover {
+            background-color: #ff1493;
+        }
+
+        .tips {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+            text-align: left;
+        }
+
+        .tips h2 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .tips ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tips li {
+            padding: 8px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .tips li::before {
+            content: "✓ ";
+            color: #ff69b4;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="icon">📡❌</div>
+
+        <h1>オフラインです</h1>
+
+        <p>
+            インターネット接続が切れています。<br>
+            Wi-Fiまたはモバイルデータ通信を確認してください。
+        </p>
+
+        <button class="button" onclick="location.reload()">
+            🔄 再読み込み
+        </button>
+
+        <div class="tips">
+            <h2>💡 オフライン時にできること</h2>
+            <ul>
+                <li>キャッシュされたページの閲覧</li>
+                <li>以前に読み込んだタスクの確認</li>
+                <li>アプリの基本UIの表示</li>
+            </ul>
+            <p style="margin-top: 15px; font-size: 13px; color: #999;">
+                ※ データの編集・同期にはインターネット接続が必要です
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // オンライン復帰時に自動リロード
+        window.addEventListener('online', () => {
+            location.reload()
+        })
+    </script>
+</body>
+
+</html>

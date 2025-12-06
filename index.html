@@ -1,13 +1,48 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Stay Focus App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <!-- 🔥 PWA設定 -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#ff69b4" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Stay Focus" />
+
+  <!-- ファビコン -->
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png" />
+
+  <!-- iOS用アイコン -->
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+
+  <!-- 説明 -->
+  <meta name="description" content="集中力を高めるプロジェクト・タスク管理アプリ" />
+
+  <title>Stay Focus - タスク管理アプリ</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+
+  <!-- 🔥 Service Worker登録 -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('✅ Service Worker登録成功:', registration.scope)
+          })
+          .catch((error) => {
+            console.log('❌ Service Worker登録失敗:', error)
+          })
+      })
+    }
+  </script>
+</body>
+
 </html>
