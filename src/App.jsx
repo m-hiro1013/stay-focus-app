@@ -7,7 +7,6 @@ import MemberManagement from './components/MemberManagement'
 import Report from './components/Report'
 import ArchiveList from './components/ArchiveList'
 import ProjectSettings from './components/ProjectSettings'
-import PullToRefresh from './components/PullToRefresh'  // 🔥 追加
 
 function App() {
   const [session, setSession] = useState(null)
@@ -127,66 +126,46 @@ function App() {
     return <Auth />
   }
 
-  // 🔥 Pull to Refresh で全体をラップ
+  // ログイン済みの場合 → メイン画面を表示
   return (
-    <PullToRefresh onRefresh={handleRefresh}>
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#f0f2f5',
+      display: 'flex',
+      justifyContent: 'center',
+      padding: isMobile ? '10px' : '20px'
+    }}>
+
       <div style={{
-        minHeight: '100vh',
-        backgroundColor: '#f0f2f5',
-        display: 'flex',
-        justifyContent: 'center',
-        padding: isMobile ? '10px' : '20px'
+        width: isMobile ? '80%' : '80%',
+        maxWidth: isMobile ? '80%' : '1200px'
       }}>
 
+        {/* ヘッダー */}
         <div style={{
-          width: isMobile ? '80%' : '80%',
-          maxWidth: isMobile ? '80%' : '1200px'
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: isMobile ? '15px' : '30px',
+          flexWrap: isMobile ? 'wrap' : 'nowrap'
         }}>
+          <h1 style={{
+            color: '#ff69b4',
+            margin: 0,
+            fontSize: isMobile ? '24px' : '32px'
+          }}>
+            stay-focus 🔥
+          </h1>
 
-          {/* ヘッダー */}
           <div style={{
             display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: isMobile ? '15px' : '30px',
-            flexWrap: isMobile ? 'wrap' : 'nowrap'
+            gap: isMobile ? '5px' : '10px',
+            flexWrap: 'wrap',
+            marginTop: isMobile ? '10px' : '0'
           }}>
-            <h1 style={{
-              color: '#ff69b4',
-              margin: 0,
-              fontSize: isMobile ? '24px' : '32px'
-            }}>
-              stay-focus 🔥
-            </h1>
-
-            <div style={{
-              display: 'flex',
-              gap: isMobile ? '5px' : '10px',
-              flexWrap: 'wrap',
-              marginTop: isMobile ? '10px' : '0'
-            }}>
-              {currentProject && (
-                <button
-                  onClick={() => setShowProjectSettings(true)}
-                  style={{
-                    padding: isMobile ? '8px 12px' : '10px 20px',
-                    backgroundColor: 'white',
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '5px',
-                    fontSize: isMobile ? '12px' : '14px'
-                  }}
-                >
-                  ⚙️ {isMobile ? '設定' : 'プロジェクト設定'}
-                </button>
-              )}
-
+            {currentProject && (
               <button
-                onClick={() => setShowArchive(true)}
+                onClick={() => setShowProjectSettings(true)}
                 style={{
                   padding: isMobile ? '8px 12px' : '10px 20px',
                   backgroundColor: 'white',
@@ -200,158 +179,238 @@ function App() {
                   fontSize: isMobile ? '12px' : '14px'
                 }}
               >
-                📦 {isMobile ? '' : 'アーカイブ'}
+                ⚙️ {isMobile ? '設定' : 'プロジェクト設定'}
               </button>
-
-              <button
-                onClick={() => setShowReport(true)}
-                style={{
-                  padding: isMobile ? '8px 12px' : '10px 20px',
-                  backgroundColor: 'white',
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  fontSize: isMobile ? '12px' : '14px'
-                }}
-              >
-                📊 {isMobile ? '' : 'レポート'}
-              </button>
-
-              <button
-                onClick={() => setShowMemberManagement(true)}
-                style={{
-                  padding: isMobile ? '8px 12px' : '10px 20px',
-                  backgroundColor: 'white',
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  fontSize: isMobile ? '12px' : '14px'
-                }}
-              >
-                👥 {isMobile ? '' : 'メンバー管理'}
-              </button>
-
-              <button
-                onClick={async () => {
-                  const confirmed = window.confirm('ログアウトしますか？')
-                  if (!confirmed) return
-
-                  await supabase.auth.signOut()
-                }}
-                style={{
-                  padding: isMobile ? '8px 12px' : '10px 20px',
-                  backgroundColor: 'white',
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  fontSize: isMobile ? '12px' : '14px'
-                }}
-              >
-                {isMobile ? '🚪' : 'ログアウト'}
-              </button>
-            </div>
-          </div>
-
-          {/* メインコンテンツ */}
-          <div style={{
-            backgroundColor: 'white',
-            padding: isMobile ? '15px' : '30px',
-            borderRadius: '16px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-          }}>
-            <ProjectList
-              teamId={teamId}
-              currentProject={currentProject}
-              onProjectChange={setCurrentProject}
-              projects={projects}
-              onUpdate={fetchProjects}
-              isMobile={isMobile}
-            />
-
-            {currentProjectInfo && currentProjectInfo.description && (
-              <div style={{
-                backgroundColor: `${currentProjectInfo.color_code}15`,
-                padding: '15px',
-                borderRadius: '12px',
-                marginBottom: '20px',
-                boxShadow: '0 2px 5px rgba(0, 0, 0, 0.05)',
-                borderLeft: `5px solid ${currentProjectInfo.color_code}`,
-                color: '#555',
-                fontSize: '14px',
-                lineHeight: '1.5'
-              }}>
-                {currentProjectInfo.description}
-              </div>
             )}
 
-            <h2 style={{
-              marginTop: 0,
-              marginBottom: '20px',
-              fontSize: isMobile ? '18px' : '24px'
-            }}>
-              {currentProject ? 'プロジェクトのタスク' : 'すべてのタスク'} 📝
-            </h2>
+            <button
+              onClick={() => setShowArchive(true)}
+              style={{
+                padding: isMobile ? '8px 12px' : '10px 20px',
+                backgroundColor: 'white',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                fontSize: isMobile ? '12px' : '14px'
+              }}
+            >
+              📦 {isMobile ? '' : 'アーカイブ'}
+            </button>
 
-            {/* 🔥 refreshKeyを追加して強制的に再レンダリング */}
-            <TaskList
-              key={refreshKey}
-              session={session}
-              teamId={teamId}
-              currentProject={currentProject}
-              projects={projects}
-              isMobile={isMobile}
-            />
+            <button
+              onClick={() => setShowReport(true)}
+              style={{
+                padding: isMobile ? '8px 12px' : '10px 20px',
+                backgroundColor: 'white',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                fontSize: isMobile ? '12px' : '14px'
+              }}
+            >
+              📊 {isMobile ? '' : 'レポート'}
+            </button>
+
+            <button
+              onClick={() => setShowMemberManagement(true)}
+              style={{
+                padding: isMobile ? '8px 12px' : '10px 20px',
+                backgroundColor: 'white',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                fontSize: isMobile ? '12px' : '14px'
+              }}
+            >
+              👥 {isMobile ? '' : 'メンバー管理'}
+            </button>
+
+            <button
+              onClick={async () => {
+                const confirmed = window.confirm('ログアウトしますか？')
+                if (!confirmed) return
+
+                await supabase.auth.signOut()
+              }}
+              style={{
+                padding: isMobile ? '8px 12px' : '10px 20px',
+                backgroundColor: 'white',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                fontSize: isMobile ? '12px' : '14px'
+              }}
+            >
+              {isMobile ? '🚪' : 'ログアウト'}
+            </button>
           </div>
         </div>
 
-        {/* モーダル群 */}
-        {showMemberManagement && (
-          <MemberManagement
+        {/* メインコンテンツ */}
+        <div style={{
+          backgroundColor: 'white',
+          padding: isMobile ? '15px' : '30px',
+          borderRadius: '16px',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+        }}>
+          <ProjectList
             teamId={teamId}
-            onClose={() => setShowMemberManagement(false)}
-          />
-        )}
-
-        {showReport && (
-          <Report
-            teamId={teamId}
-            onClose={() => setShowReport(false)}
-          />
-        )}
-
-        {showArchive && (
-          <ArchiveList
-            teamId={teamId}
-            onClose={() => setShowArchive(false)}
+            currentProject={currentProject}
+            onProjectChange={setCurrentProject}
+            projects={projects}
             onUpdate={fetchProjects}
+            isMobile={isMobile}
           />
-        )}
 
-        {showProjectSettings && currentProjectInfo && (
-          <ProjectSettings
-            project={currentProjectInfo}
+          {currentProjectInfo && currentProjectInfo.description && (
+            <div style={{
+              backgroundColor: `${currentProjectInfo.color_code}15`,
+              padding: '15px',
+              borderRadius: '12px',
+              marginBottom: '20px',
+              boxShadow: '0 2px 5px rgba(0, 0, 0, 0.05)',
+              borderLeft: `5px solid ${currentProjectInfo.color_code}`,
+              color: '#555',
+              fontSize: '14px',
+              lineHeight: '1.5'
+            }}>
+              {currentProjectInfo.description}
+            </div>
+          )}
+
+          <h2 style={{
+            marginTop: 0,
+            marginBottom: '20px',
+            fontSize: isMobile ? '18px' : '24px'
+          }}>
+            {currentProject ? 'プロジェクトのタスク' : 'すべてのタスク'} 📝
+          </h2>
+
+          {/* 🔥 refreshKeyを追加して強制的に再レンダリング */}
+          <TaskList
+            key={refreshKey}
+            session={session}
             teamId={teamId}
-            onClose={() => {
-              setShowProjectSettings(false)
-              fetchProjects()
-              setCurrentProject(null)
-            }}
-            onUpdate={() => {
-              fetchProjects()
-            }}
+            currentProject={currentProject}
+            projects={projects}
+            isMobile={isMobile}
           />
-        )}
+
+          {/* 🔥 更新ボタン */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: '30px',
+            paddingTop: '20px',
+            borderTop: '1px solid #eee'
+          }}>
+            <button
+              onClick={async () => {
+                const btn = document.getElementById('refresh-btn')
+                const originalText = btn.innerHTML
+                btn.innerHTML = '🔄 更新中...'
+                btn.disabled = true
+                btn.style.opacity = '0.6'
+
+                await handleRefresh()
+
+                btn.innerHTML = '✅ 更新完了！'
+                setTimeout(() => {
+                  btn.innerHTML = originalText
+                  btn.disabled = false
+                  btn.style.opacity = '1'
+                }, 1000)
+              }}
+              id="refresh-btn"
+              style={{
+                padding: isMobile ? '12px 24px' : '14px 32px',
+                backgroundColor: '#ff69b4',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                fontSize: isMobile ? '14px' : '16px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(255, 105, 180, 0.3)',
+                transition: 'all 0.3s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+              onMouseEnter={(e) => {
+                if (!e.target.disabled) {
+                  e.target.style.backgroundColor = '#ff1493'
+                  e.target.style.transform = 'translateY(-2px)'
+                  e.target.style.boxShadow = '0 4px 12px rgba(255, 105, 180, 0.4)'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!e.target.disabled) {
+                  e.target.style.backgroundColor = '#ff69b4'
+                  e.target.style.transform = 'translateY(0)'
+                  e.target.style.boxShadow = '0 2px 8px rgba(255, 105, 180, 0.3)'
+                }
+              }}
+            >
+              <span style={{ fontSize: '18px' }}>🔄</span>
+              最新の状態に更新
+            </button>
+          </div>
+        </div>
       </div>
-    </PullToRefresh>
+
+      {/* モーダル群 */}
+      {showMemberManagement && (
+        <MemberManagement
+          teamId={teamId}
+          onClose={() => setShowMemberManagement(false)}
+        />
+      )}
+
+      {showReport && (
+        <Report
+          teamId={teamId}
+          onClose={() => setShowReport(false)}
+        />
+      )}
+
+      {showArchive && (
+        <ArchiveList
+          teamId={teamId}
+          onClose={() => setShowArchive(false)}
+          onUpdate={fetchProjects}
+        />
+      )}
+
+      {showProjectSettings && currentProjectInfo && (
+        <ProjectSettings
+          project={currentProjectInfo}
+          teamId={teamId}
+          onClose={() => {
+            setShowProjectSettings(false)
+            fetchProjects()
+            setCurrentProject(null)
+          }}
+          onUpdate={() => {
+            fetchProjects()
+          }}
+        />
+      )}
+    </div>
+    </div >
   )
 }
 

@@ -1,5 +1,5 @@
 // Service Worker - Stay Focus App
-const CACHE_NAME = 'stay-focus-v1'
+const CACHE_NAME = 'stay-focus-v4'  // 🔥 v1 → v4
 const OFFLINE_URL = '/offline.html'
 
 // キャッシュするファイル
