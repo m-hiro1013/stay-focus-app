@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '../supabase'
 import TaskDetailModal from './TaskDetailModal'
@@ -32,7 +32,16 @@ function SortableTaskItem({
   projectColor,
   onToggleImportant,
   onTogglePin,
-  checkTaskStatus
+  checkTaskStatus,
+  isPWA,
+  isSwipedOpen,
+  swipeDirection,
+  onTouchStart,
+  onTouchMove,
+  onTouchEnd,
+  onSwipeComplete,
+  onSwipeDelete,
+  onCloseSwipe,
 }) {
   const {
     attributes,
@@ -59,25 +68,89 @@ function SortableTaskItem({
     opacity: isDragging ? 0.5 : 1,
   }
 
+  // 🔥 PWAモード時のクリック処理
+  const handleCardClick = (e) => {
+    if (!isPWA) {
+      // PC版は通常通りモーダルを開く
+      onClick()
+      return
+    }
+
+    // PWAモード：スワイプが開いている場合は閉じる
+    if (isSwipedOpen) {
+      onCloseSwipe()
+      return
+    }
+
+    // スワイプが閉じている場合はモーダルを開く
+    onClick()
+  }
+
+  // 🔥 PWAモード：スワイプ状態のクラス
+  const getSwipeClass = () => {
+    if (!isPWA || !isSwipedOpen) return ''
+    if (swipeDirection === 'right') return 'swiped-right'
+    if (swipeDirection === 'left') return 'swiped-left'
+    return ''
+  }
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      onClick={onClick}
-      onMouseEnter={(e) => !isDragging && (e.currentTarget.style.backgroundColor = hasWarning ? '#ffe6e6' : '#f9f9f9')}
-      onMouseLeave={(e) => !isDragging && (e.currentTarget.style.backgroundColor = hasWarning ? '#fff5f5' : 'transparent')}
+      id={`task-${task.id}`}
+      className={isPWA ? 'swipe-container' : ''}
     >
+      {/* 🔥 PWAモード：スワイプアクションボタン（背後） */}
+      {isPWA && isSwipedOpen && swipeDirection === 'right' && (
+        <div className="swipe-actions swipe-action-complete">
+          <div
+            className="swipe-action-content"
+            onClick={() => onSwipeComplete(task.id, task.is_completed)}
+          >
+            <span className="swipe-action-icon">✓</span>
+            <span>完了</span>
+          </div>
+        </div>
+      )}
+
+      {isPWA && isSwipedOpen && swipeDirection === 'left' && (
+        <div className="swipe-actions swipe-action-delete">
+          <div
+            className="swipe-action-content"
+            onClick={() => onSwipeDelete(task.id)}
+          >
+            <span className="swipe-action-icon">🗑</span>
+            <span>削除</span>
+          </div>
+        </div>
+      )}
+
+      {/* タスクカード本体 */}
       <div
-        className={`task-card ${hasWarning ? 'task-warning' : ''}`}
+        className={`task-card ${hasWarning ? 'task-warning' : ''} ${isPWA ? `swipe-card ${getSwipeClass()}` : ''}`}
         style={{
           borderLeft: projectColor ? `5px solid ${projectColor}` : 'none',
         }}
+        onClick={handleCardClick}
+        onMouseEnter={(e) => !isDragging && !isPWA && (e.currentTarget.style.backgroundColor = hasWarning ? '#ffe6e6' : '#f9f9f9')}
+        onMouseLeave={(e) => !isDragging && !isPWA && (e.currentTarget.style.backgroundColor = hasWarning ? '#fff5f5' : 'transparent')}
+        onTouchStart={(e) => isPWA && onTouchStart(e, task.id)}
+        onTouchMove={(e) => isPWA && onTouchMove(e, task.id)}
+        onTouchEnd={(e) => isPWA && onTouchEnd(e, task.id)}
       >
         {/* ドラッグハンドル */}
         <span
           {...attributes}
           {...listeners}
           className="icon-drag"
+          onClick={(e) => e.stopPropagation()}
+          onTouchStart={(e) => {
+            // PWAモード：ハンドルをタッチした時はスワイプ無効
+            if (isPWA) {
+              e.stopPropagation()
+            }
+          }}
         >
           ☰
         </span>
@@ -86,6 +159,10 @@ function SortableTaskItem({
         <span
           onClick={(e) => {
             e.stopPropagation()
+            // 🔥 PWAモード：ピン留めタップ時はスワイプを閉じる
+            if (isPWA && isSwipedOpen) {
+              onCloseSwipe()
+            }
             onTogglePin(task.id, task.is_pinned)
           }}
           className={`icon-pin ${task.is_pinned ? 'active' : 'inactive'}`}
@@ -98,6 +175,10 @@ function SortableTaskItem({
         <span
           onClick={(e) => {
             e.stopPropagation()
+            // 🔥 PWAモード：重要マークタップ時はスワイプを閉じる
+            if (isPWA && isSwipedOpen) {
+              onCloseSwipe()
+            }
             onToggleImportant(task.id, task.is_important)
           }}
           className={`icon-star ${task.is_important ? 'active' : 'inactive'}`}
@@ -106,7 +187,7 @@ function SortableTaskItem({
           {task.is_important ? '⭐' : '☆'}
         </span>
 
-        {/* チェックボックス */}
+        {/* チェックボックス（PWAモードでは非表示） */}
         <input
           type="checkbox"
           checked={task.is_completed}
@@ -163,7 +244,7 @@ function SortableTaskItem({
           )}
         </div>
 
-        {/* 削除ボタン */}
+        {/* 削除ボタン（PWAモードでは非表示） */}
         <button
           type="button"
           onClick={(e) => onDelete(task.id, e)}
@@ -177,6 +258,7 @@ function SortableTaskItem({
     </div>
   )
 }
+
 // ========================================
 // DroppableTimeFrame コンポーネント
 // ========================================
@@ -190,7 +272,16 @@ function DroppableTimeFrame({
   getProjectColor,
   onToggleImportant,
   onTogglePin,
-  checkTaskStatus
+  checkTaskStatus,
+  isPWA,
+  swipedTaskId,
+  swipeDirection,
+  onTouchStart,
+  onTouchMove,
+  onTouchEnd,
+  onSwipeComplete,
+  onSwipeDelete,
+  onCloseSwipe,
 }) {
   const {
     setNodeRef,
@@ -219,6 +310,15 @@ function DroppableTimeFrame({
               onToggleImportant={onToggleImportant}
               onTogglePin={onTogglePin}
               checkTaskStatus={checkTaskStatus}
+              isPWA={isPWA}
+              isSwipedOpen={swipedTaskId === task.id}
+              swipeDirection={swipeDirection}
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+              onSwipeComplete={onSwipeComplete}
+              onSwipeDelete={onSwipeDelete}
+              onCloseSwipe={onCloseSwipe}
             />
           ))
         )}
@@ -226,7 +326,6 @@ function DroppableTimeFrame({
     </div>
   )
 }
-
 // ========================================
 // TaskList メインコンポーネント
 // ========================================
@@ -250,6 +349,16 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     assignees: []
   })
 
+  // 🔥 PWA判定とスワイプ状態
+  const [isPWA, setIsPWA] = useState(false)
+  const [swipedTaskId, setSwipedTaskId] = useState(null)
+  const [swipeDirection, setSwipeDirection] = useState(null)
+
+  // 🔥 スワイプ用のref
+  const touchStartX = useRef(0)
+  const touchCurrentX = useRef(0)
+  const isSwiping = useRef(false)
+
   const timeFrames = ['今日', '明日', '今週', '来週', '来月以降']
   const UNDO_STACK_MAX_SIZE = 10
 
@@ -263,6 +372,160 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
+
+  // 🔥 PWAモード判定
+  useEffect(() => {
+    const checkPWA = () => {
+      const pwaMode = document.documentElement.classList.contains('pwa-mode')
+      setIsPWA(pwaMode)
+    }
+
+    checkPWA()
+
+    // PWAモード切り替えを監視
+    const observer = new MutationObserver(checkPWA)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
+  // 🔥 スワイプハンドラ（PWA専用）
+  const handleTouchStart = (e, taskId) => {
+    if (!isPWA) return
+
+    touchStartX.current = e.touches[0].clientX
+    touchCurrentX.current = e.touches[0].clientX
+    isSwiping.current = false
+  }
+
+  const handleTouchMove = (e, taskId) => {
+    if (!isPWA) return
+
+    touchCurrentX.current = e.touches[0].clientX
+    const diff = Math.abs(touchCurrentX.current - touchStartX.current)
+
+    // 10px以上の移動でスワイプと判定
+    if (diff > 10) {
+      isSwiping.current = true
+    }
+  }
+
+  const handleTouchEnd = (e, taskId) => {
+    if (!isPWA || !isSwiping.current) {
+      isSwiping.current = false
+      return
+    }
+
+    const diff = touchCurrentX.current - touchStartX.current
+    const threshold = 50
+
+    // 他のタスクがスワイプされている場合は閉じる
+    if (swipedTaskId && swipedTaskId !== taskId) {
+      setSwipedTaskId(null)
+      setSwipeDirection(null)
+    }
+
+    if (diff > threshold) {
+      // 右スワイプ → 完了ボタン表示
+      setSwipedTaskId(taskId)
+      setSwipeDirection('right')
+    } else if (diff < -threshold) {
+      // 左スワイプ → 削除ボタン表示
+      setSwipedTaskId(taskId)
+      setSwipeDirection('left')
+    } else {
+      // スワイプが不十分 → 閉じる
+      setSwipedTaskId(null)
+      setSwipeDirection(null)
+    }
+
+    isSwiping.current = false
+  }
+
+  // 🔥 スワイプを閉じる
+  const closeSwipe = () => {
+    if (!isPWA) return
+    setSwipedTaskId(null)
+    setSwipeDirection(null)
+  }
+
+  // 🔥 完了アクション（スワイプ経由）
+  const handleSwipeComplete = async (taskId, isCompleted) => {
+    if (!isPWA) return
+
+    // スワイプアウトアニメーション
+    const taskElement = document.getElementById(`task-${taskId}`)
+    if (taskElement) {
+      taskElement.classList.add('swipe-out')
+    }
+
+    // アニメーション後に完了処理
+    setTimeout(async () => {
+      const task = tasks.find(t => t.id === taskId)
+      if (!task) return
+
+      const newUndoStack = [...undoStack, {
+        action: 'complete',
+        task: { ...task }
+      }]
+
+      if (newUndoStack.length > UNDO_STACK_MAX_SIZE) {
+        newUndoStack.shift()
+      }
+
+      setUndoStack(newUndoStack)
+
+      const { error } = await supabase
+        .from('tasks')
+        .update({
+          is_completed: !isCompleted,
+          completed_at: !isCompleted ? new Date().toISOString() : null
+        })
+        .eq('id', taskId)
+
+      if (!error) {
+        fetchTasks()
+      }
+
+      closeSwipe()
+    }, 300)
+  }
+
+  // 🔥 削除アクション（スワイプ経由）
+  const handleSwipeDelete = async (taskId) => {
+    if (!isPWA) return
+
+    if (!window.confirm('本当に削除する？')) {
+      closeSwipe()
+      return
+    }
+
+    // スワイプアウトアニメーション
+    const taskElement = document.getElementById(`task-${taskId}`)
+    if (taskElement) {
+      taskElement.classList.add('swipe-out')
+    }
+
+    // アニメーション後に削除処理
+    setTimeout(async () => {
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', taskId)
+
+      if (error) {
+        alert('エラー: ' + error.message)
+        return
+      }
+
+      alert('削除したよ！🗑️')
+      setTasks(tasks.filter(task => task.id !== taskId))
+      closeSwipe()
+    }, 300)
+  }
 
   // ========================================
   // 期日切れ & 時間枠不一致チェック
@@ -602,6 +865,7 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
       return []
     }
   }
+
   // ========================================
   // 時間枠ごとにグループ化
   // ========================================
@@ -621,6 +885,11 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
   // ========================================
   const handleDragStart = (event) => {
     setActiveId(event.active.id)
+
+    // 🔥 PWAモード：ドラッグ開始時はスワイプを閉じる
+    if (isPWA && swipedTaskId) {
+      closeSwipe()
+    }
   }
 
   // ========================================
@@ -782,6 +1051,15 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
                     onToggleImportant={toggleImportant}
                     onTogglePin={togglePin}
                     checkTaskStatus={checkTaskStatus}
+                    isPWA={isPWA}
+                    swipedTaskId={swipedTaskId}
+                    swipeDirection={swipeDirection}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                    onSwipeComplete={handleSwipeComplete}
+                    onSwipeDelete={handleSwipeDelete}
+                    onCloseSwipe={closeSwipe}
                   />
                 </div>
               </div>

@@ -137,8 +137,6 @@ body.pwa-mode {
    ======================================== */
 
 .pwa-mode .app-header,
-.pwa-mode .project-tabs-container,
-.pwa-mode .project-tabs,
 .pwa-mode .task-card,
 .pwa-mode .timeframe-tasks {
     max-width: 100%;
@@ -173,22 +171,21 @@ body.pwa-mode {
    🎨 アイコン
    ======================================== */
 
-/* ドラッグハンドル */
+/* ドラッグハンドル（拡大） */
 .pwa-mode .icon-drag {
-    font-size: 20px;
-}
-
-/* 削除ボタン（アイコン表示に変更） */
-.pwa-mode .icon-delete {
-    background-color: transparent;
-    color: var(--color-text-tertiary);
+    font-size: 24px;
     padding: 8px;
-    font-size: 18px;
+    margin: -8px;
 }
 
-.pwa-mode .icon-delete:active {
-    color: var(--color-danger);
-    transform: scale(1.1);
+/* チェックボックスを非表示 */
+.pwa-mode .task-checkbox {
+    display: none;
+}
+
+/* 削除ボタンを非表示 */
+.pwa-mode .icon-delete {
+    display: none;
 }
 
 /* 削除ボタンのテキスト/アイコン切り替え */
@@ -220,11 +217,12 @@ body.pwa-mode {
 
 .pwa-mode .project-tabs-container {
     width: 100%;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .pwa-mode .project-tabs {
-    width: 100%;
+    width: auto;
     box-sizing: border-box;
 }
 
@@ -285,5 +283,94 @@ body.pwa-mode {
     to {
         transform: translateX(-50%) translateY(0);
         opacity: 1;
+    }
+}
+
+/* ========================================
+   👆 スワイプ機能（PWA専用）
+   ======================================== */
+
+/* スワイプコンテナ */
+.pwa-mode .swipe-container {
+    position: relative;
+    overflow: hidden;
+}
+
+/* スワイプ可能なカード */
+.pwa-mode .swipe-card {
+    position: relative;
+    background-color: white;
+    transition: transform 0.3s ease;
+    will-change: transform;
+    z-index: 2;
+}
+
+/* スワイプ中はアニメーション無効 */
+.pwa-mode .swipe-card.swiping {
+    transition: none;
+}
+
+/* 右にスワイプ（完了ボタン表示） */
+.pwa-mode .swipe-card.swiped-right {
+    transform: translateX(100px);
+}
+
+/* 左にスワイプ（削除ボタン表示） */
+.pwa-mode .swipe-card.swiped-left {
+    transform: translateX(-100px);
+}
+
+/* スワイプアクションボタン（背後） */
+.pwa-mode .swipe-actions {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    z-index: 1;
+}
+
+/* 完了ボタン（左側） */
+.pwa-mode .swipe-action-complete {
+    left: 0;
+    background-color: #51cf66;
+    color: white;
+}
+
+/* 削除ボタン（右側） */
+.pwa-mode .swipe-action-delete {
+    right: 0;
+    background-color: #ff4d4d;
+    color: white;
+}
+
+/* ボタン内容 */
+.pwa-mode .swipe-action-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 0 16px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.pwa-mode .swipe-action-icon {
+    font-size: 20px;
+}
+
+/* スワイプアウトアニメーション（完了・削除時） */
+.pwa-mode .swipe-out {
+    animation: swipeOutRight 0.3s ease forwards;
+}
+
+@keyframes swipeOutRight {
+    to {
+        transform: translateX(100%);
+        opacity: 0;
     }
 }
