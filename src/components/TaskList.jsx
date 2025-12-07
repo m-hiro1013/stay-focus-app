@@ -19,6 +19,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { restrictToVerticalAxis, restrictToWindowEdges } from '@dnd-kit/modifiers'  // 🔥 追加
 
 // ドラッグ可能なタスクカードコンポーネント
 function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projectColor, onToggleImportant, onTogglePin, checkTaskStatus, isMobile }) {
@@ -29,7 +30,14 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: task.id })
+  } = useSortable({
+    id: task.id,
+    // 🔥 以下を追加
+    transition: {
+      duration: 150,
+      easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+    },
+  })
 
   // ✅ ステータスチェック
   const { isOverdue, isTimeFrameMismatch } = checkTaskStatus(task)
@@ -299,7 +307,12 @@ export default function TaskList({ session, teamId, currentProject, projects, is
   const UNDO_STACK_MAX_SIZE = 10
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      // 🔥 5px以上動かさないとドラッグ開始しない
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -800,6 +813,7 @@ export default function TaskList({ session, teamId, currentProject, projects, is
         collisionDetection={closestCenter}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
+        modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}  // 🔥 追加
       >
         <SortableContext items={allItems}>
           {tasks.length === 0 ? (
@@ -859,7 +873,13 @@ export default function TaskList({ session, teamId, currentProject, projects, is
           )}
         </SortableContext>
 
-        <DragOverlay dropAnimation={null}>
+        <DragOverlay
+          dropAnimation={null}
+          style={{
+            position: 'fixed',  // 🔥 追加
+            zIndex: 9999  // 🔥 追加
+          }}
+        >
           {activeTask ? (
             <div style={{
               padding: '15px',
@@ -867,7 +887,9 @@ export default function TaskList({ session, teamId, currentProject, projects, is
               borderRadius: '12px',
               boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
               border: '2px solid #ff69b4',
-              opacity: 0.9
+              opacity: 0.9,
+              cursor: 'grabbing',  // 🔥 追加
+              pointerEvents: 'none'  // 🔥 追加
             }}>
               <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
                 {activeTask.task_name}
