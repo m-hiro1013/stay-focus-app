@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'  // 🔥 追加
 import { supabase } from '../supabase'
 
 export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
@@ -95,7 +96,7 @@ export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
     }
   }
 
-  return (
+  return createPortal(
     <div style={{
       position: 'fixed',
       top: 0,
@@ -212,77 +213,77 @@ export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
           </select>
         </div>
 
-{/* 期日 */}
-<div style={{ marginBottom: '20px' }}>
-  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-    期日
-  </label>
-  <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-    <input
-      type="date"
-      value={dueDate}
-      onChange={(e) => setDueDate(e.target.value)}
-      style={{
-        flex: 1,
-        padding: '12px',
-        border: '1px solid #ddd',
-        borderRadius: '8px',
-        fontSize: '16px'
-      }}
-    />
-    <select
-      value={dueTime}
-      onChange={(e) => setDueTime(e.target.value)}
-      onFocus={(e) => {
-        // ✅ 初回クリック時のみ、空なら17:00にする
-        if (dueTime === '') {
-          setDueTime('17:00')
-        }
-      }}
-      style={{
-        flex: 1,
-        padding: '12px',
-        border: '1px solid #ddd',
-        borderRadius: '8px',
-        fontSize: '16px',
-        backgroundColor: 'white'
-      }}
-    >
-      <option value="">時間なし</option>
-      {Array.from({ length: 48 }, (_, i) => {
-        const hour = Math.floor(i / 2)
-        const minute = (i % 2) * 30
-        const timeValue = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
-        return (
-          <option key={timeValue} value={timeValue}>
-            {timeValue}
-          </option>
-        )
-      })}
-    </select>
-  </div>
-  {(dueDate || dueTime) && (
-    <button
-      type="button"
-      onClick={() => {
-        setDueDate('')
-        setDueTime('')
-      }}
-      style={{
-        padding: '8px 16px',
-        backgroundColor: '#f0f0f0',
-        color: '#666',
-        border: '1px solid #ddd',
-        borderRadius: '8px',
-        cursor: 'pointer',
-        fontSize: '14px',
-        width: '100%'
-      }}
-    >
-      🗑️ 期日をクリア
-    </button>
-  )}
-</div>
+        {/* 期日 */}
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+            期日
+          </label>
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+            <input
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              style={{
+                flex: 1,
+                padding: '12px',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                fontSize: '16px'
+              }}
+            />
+            <select
+              value={dueTime}
+              onChange={(e) => setDueTime(e.target.value)}
+              onFocus={(e) => {
+                // ✅ 初回クリック時のみ、空なら17:00にする
+                if (dueTime === '') {
+                  setDueTime('17:00')
+                }
+              }}
+              style={{
+                flex: 1,
+                padding: '12px',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                fontSize: '16px',
+                backgroundColor: 'white'
+              }}
+            >
+              <option value="">時間なし</option>
+              {Array.from({ length: 48 }, (_, i) => {
+                const hour = Math.floor(i / 2)
+                const minute = (i % 2) * 30
+                const timeValue = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+                return (
+                  <option key={timeValue} value={timeValue}>
+                    {timeValue}
+                  </option>
+                )
+              })}
+            </select>
+          </div>
+          {(dueDate || dueTime) && (
+            <button
+              type="button"
+              onClick={() => {
+                setDueDate('')
+                setDueTime('')
+              }}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#f0f0f0',
+                color: '#666',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                width: '100%'
+              }}
+            >
+              🗑️ 期日をクリア
+            </button>
+          )}
+        </div>
 
         {/* 重要マーク・ピン留め */}
         <div style={{ marginBottom: '20px', display: 'flex', gap: '20px' }}>
@@ -383,6 +384,7 @@ export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body  // 🔥 追加
   )
 }

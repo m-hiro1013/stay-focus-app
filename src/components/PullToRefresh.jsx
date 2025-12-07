@@ -85,9 +85,8 @@ export default function PullToRefresh({ onRefresh, children }) {
             ref={containerRef}
             style={{
                 width: '100%',
-                height: '100vh',
+                minHeight: '100vh',
                 overflow: 'auto',
-                position: 'relative',
                 WebkitOverflowScrolling: 'touch'
             }}
         >

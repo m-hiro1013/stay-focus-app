@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'  // 🔥 追加
 import { supabase } from '../supabase'
 import TaskDetailModal from './TaskDetailModal'
 import {
@@ -858,7 +859,7 @@ export default function TaskList({ session, teamId, currentProject, projects, is
           )}
         </SortableContext>
 
-        <DragOverlay>
+        <DragOverlay dropAnimation={null}>
           {activeTask ? (
             <div style={{
               padding: '15px',
@@ -887,7 +888,7 @@ export default function TaskList({ session, teamId, currentProject, projects, is
       )}
 
       {/* タスク作成モーダル */}
-      {showCreateModal && (
+      {showCreateModal && createPortal(
         <div style={{
           position: 'fixed',
           top: 0,
@@ -1161,7 +1162,8 @@ export default function TaskList({ session, teamId, currentProject, projects, is
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
