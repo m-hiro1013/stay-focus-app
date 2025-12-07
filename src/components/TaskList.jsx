@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'  // 🔥 追加
+import { createPortal } from 'react-dom'
 import { supabase } from '../supabase'
 import TaskDetailModal from './TaskDetailModal'
 import {
@@ -20,8 +20,20 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-// ドラッグ可能なタスクカードコンポーネント
-function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projectColor, onToggleImportant, onTogglePin, checkTaskStatus }) {
+// ========================================
+// SortableTaskItem コンポーネント
+// ========================================
+function SortableTaskItem({
+  task,
+  assignees,
+  onToggle,
+  onDelete,
+  onClick,
+  projectColor,
+  onToggleImportant,
+  onTogglePin,
+  checkTaskStatus
+}) {
   const {
     attributes,
     listeners,
@@ -31,14 +43,13 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
     isDragging,
   } = useSortable({
     id: task.id,
-    // 🔥 以下を追加
     transition: {
       duration: 150,
       easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
     },
   })
 
-  // ✅ ステータスチェック
+  // ステータスチェック
   const { isOverdue, isTimeFrameMismatch } = checkTaskStatus(task)
   const hasWarning = isOverdue || isTimeFrameMismatch
 
@@ -56,66 +67,40 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
       onMouseEnter={(e) => !isDragging && (e.currentTarget.style.backgroundColor = hasWarning ? '#ffe6e6' : '#f9f9f9')}
       onMouseLeave={(e) => !isDragging && (e.currentTarget.style.backgroundColor = hasWarning ? '#fff5f5' : 'transparent')}
     >
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '10px',
-        padding: '15px 10px',
-        borderBottom: '1px solid #f0f0f0',
-        cursor: 'pointer',
-        borderLeft: projectColor ? `5px solid ${projectColor}` : 'none',
-        backgroundColor: hasWarning ? '#fff5f5' : 'white',
-        border: hasWarning ? '1px solid #ffcccc' : 'none'
-      }}>
+      <div
+        className={`task-card ${hasWarning ? 'task-warning' : ''}`}
+        style={{
+          borderLeft: projectColor ? `5px solid ${projectColor}` : 'none',
+        }}
+      >
         {/* ドラッグハンドル */}
         <span
           {...attributes}
           {...listeners}
-          style={{
-            cursor: 'grab',
-            fontSize: '18px',
-            color: '#999',
-            touchAction: 'none',
-            flexShrink: 0
-          }}
+          className="icon-drag"
         >
           ☰
         </span>
 
-        {/* ピン留めアイコン（クリック可能） */}
+        {/* ピン留めアイコン */}
         <span
           onClick={(e) => {
             e.stopPropagation()
             onTogglePin(task.id, task.is_pinned)
           }}
-          style={{
-            fontSize: '16px',
-            cursor: 'pointer',
-            opacity: task.is_pinned ? 1 : 0.3,
-            filter: task.is_pinned ? 'none' : 'grayscale(100%)',
-            transition: 'all 0.2s',
-            userSelect: 'none',
-            flexShrink: 0
-          }}
+          className={`icon-pin ${task.is_pinned ? 'active' : 'inactive'}`}
           title={task.is_pinned ? 'ピン留め解除' : 'ピン留め'}
         >
           📌
         </span>
 
-        {/* 重要マーク（クリック可能） */}
+        {/* 重要マーク */}
         <span
           onClick={(e) => {
             e.stopPropagation()
             onToggleImportant(task.id, task.is_important)
           }}
-          style={{
-            fontSize: '18px',
-            cursor: 'pointer',
-            color: task.is_important ? '#FFD700' : '#e0e0e0',
-            transition: 'color 0.2s',
-            userSelect: 'none',
-            flexShrink: 0
-          }}
+          className={`icon-star ${task.is_important ? 'active' : 'inactive'}`}
           title={task.is_important ? '重要マーク解除' : '重要マーク'}
         >
           {task.is_important ? '⭐' : '☆'}
@@ -127,33 +112,15 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
           checked={task.is_completed}
           onChange={(e) => onToggle(task.id, task.is_completed, e)}
           onClick={(e) => e.stopPropagation()}
-          style={{
-            width: '18px',
-            height: '18px',
-            cursor: 'pointer',
-            flexShrink: 0
-          }}
+          className="task-checkbox"
         />
 
         {/* タスク情報 */}
-        <div style={{ flex: 1, minWidth: 0 }}> {/* 🔥 minWidth: 0 でテキストの折り返しを強制 */}
-          <div style={{
-            fontWeight: 'bold',
-            fontSize: '16px',
-            marginBottom: '4px',
-            color: hasWarning ? '#d9534f' : 'inherit',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            wordBreak: 'break-word' // 🔥 長いタスク名を折り返す
-          }}>
+        <div className="task-card-content">
+          <div className="task-name">
             {hasWarning && (
               <span
-                style={{
-                  fontSize: '16px',
-                  animation: 'pulse 1.5s ease-in-out infinite',
-                  flexShrink: 0 // 🔥 アイコンは縮小させない
-                }}
+                className="task-warning-icon"
                 title={
                   isOverdue
                     ? '⚠️ 期日が過ぎています！'
@@ -168,91 +135,63 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
 
           {/* 担当者表示 */}
           {assignees.length > 0 && (
-            <div style={{
-              display: 'flex',
-              gap: '5px',
-              marginBottom: '4px',
-              flexWrap: 'wrap'
-            }}>
+            <div className="task-assignees">
               {assignees.map((assignee, index) => (
-                <span key={index} style={{
-                  fontSize: '11px',
-                  padding: '2px 8px',
-                  backgroundColor: '#f0f0f0',
-                  borderRadius: '10px',
-                  color: '#666',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}>
-                  <div style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    backgroundColor: assignee.color
-                  }} />
+                <span key={index} className="task-assignee">
+                  <div
+                    className="assignee-color"
+                    style={{ backgroundColor: assignee.color }}
+                  />
                   {assignee.name}
                 </span>
               ))}
             </div>
           )}
 
+          {/* メモ */}
           {task.memo && (
-            <div style={{
-              fontSize: '13px',
-              color: '#666',
-              marginBottom: '4px',
-              wordBreak: 'break-word' // 🔥 メモも折り返す
-            }}>
+            <div className="task-memo">
               {task.memo}
             </div>
           )}
+
+          {/* 期日 */}
           {task.due_date && (
-            <div style={{
-              fontSize: '12px',
-              color: hasWarning ? '#d9534f' : '#999',
-              fontWeight: hasWarning ? 'bold' : 'normal'
-            }}>
+            <div className={`task-meta ${hasWarning ? 'task-meta-warning' : ''}`}>
               📅 {task.due_date} {task.due_time || ''}
             </div>
           )}
         </div>
 
-        {/* ✅ 削除ボタン（PC/スマホ統一） */}
+        {/* 削除ボタン */}
         <button
           type="button"
           onClick={(e) => onDelete(task.id, e)}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#ff4d4d',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '500',
-            flexShrink: 0,
-            whiteSpace: 'nowrap',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#e63939'
-            e.currentTarget.style.transform = 'translateY(-1px)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#ff4d4d'
-            e.currentTarget.style.transform = 'translateY(0)'
-          }}
+          className="icon-delete"
+          title="削除"
         >
-          削除
+          <span className="delete-text">削除</span>
+          <span className="delete-icon">🗑️</span>
         </button>
       </div>
     </div>
   )
 }
-
-// ドロップ可能なグループコンテナ
-function DroppableTimeFrame({ timeFrame, tasks, assignees, onToggle, onDelete, onClick, getProjectColor, onToggleImportant, onTogglePin, checkTaskStatus }) {
+// ========================================
+// DroppableTimeFrame コンポーネント
+// ========================================
+function DroppableTimeFrame({
+  timeFrame,
+  tasks,
+  assignees,
+  onToggle,
+  onDelete,
+  onClick,
+  getProjectColor,
+  onToggleImportant,
+  onTogglePin,
+  checkTaskStatus
+}) {
   const {
     setNodeRef,
   } = useSortable({ id: `group-${timeFrame}` })
@@ -264,15 +203,7 @@ function DroppableTimeFrame({ timeFrame, tasks, assignees, onToggle, onDelete, o
         strategy={verticalListSortingStrategy}
       >
         {tasks.length === 0 ? (
-          <div style={{
-            padding: '40px 20px',
-            textAlign: 'center',
-            color: '#999',
-            fontSize: '14px',
-            backgroundColor: '#fafafa',
-            border: '2px dashed #e0e0e0',
-            borderRadius: '8px'
-          }}>
+          <div className="task-dropzone-empty">
             ここにドロップ 👇
           </div>
         ) : (
@@ -296,6 +227,9 @@ function DroppableTimeFrame({ timeFrame, tasks, assignees, onToggle, onDelete, o
   )
 }
 
+// ========================================
+// TaskList メインコンポーネント
+// ========================================
 export default function TaskList({ session, teamId, currentProject, projects }) {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
@@ -321,7 +255,6 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      // 🔥 5px以上動かさないとドラッグ開始しない
       activationConstraint: {
         distance: 5,
       },
@@ -331,17 +264,17 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     })
   )
 
-  // ✅ 期日切れ & 時間枠が遅すぎるをチェックする関数（修正版）
+  // ========================================
+  // 期日切れ & 時間枠不一致チェック
+  // ========================================
   const checkTaskStatus = (task) => {
     if (!task.due_date || task.is_completed) {
       return { isOverdue: false, isTimeFrameMismatch: false }
     }
 
-    // ✅ 日付のみで比較（時刻を無視）
     const now = new Date()
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
 
-    // ✅ 期日も0時にリセット
     const dueDateParts = task.due_date.split('-')
     const dueDate = new Date(
       parseInt(dueDateParts[0]),
@@ -349,16 +282,13 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
       parseInt(dueDateParts[2])
     )
 
-    // ✅ 期日切れチェック（期日が今日より前）
     const isOverdue = dueDate < today
 
-    // ✅ 時間枠が遅すぎるかチェック
     let isTimeFrameMismatch = false
 
     if (task.priority_time_frame && task.due_date) {
       const daysDiff = Math.round((dueDate - today) / (1000 * 60 * 60 * 24))
 
-      // ✅ 時間枠の「最小日数」を定義
       const timeFrameMinDays = {
         '今日': 0,
         '明日': 1,
@@ -377,7 +307,9 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     return { isOverdue, isTimeFrameMismatch }
   }
 
-  // Command + Z / Ctrl + Z でUndo
+  // ========================================
+  // Undo機能（Command + Z / Ctrl + Z）
+  // ========================================
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
@@ -390,7 +322,6 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [undoStack])
 
-  // Undo処理
   const handleUndo = async () => {
     if (undoStack.length === 0) {
       alert('戻す操作がないよ！')
@@ -416,7 +347,9 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     }
   }
 
+  // ========================================
   // メンバー一覧を取得
+  // ========================================
   useEffect(() => {
     if (!teamId) return
 
@@ -434,14 +367,18 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     fetchMembers()
   }, [teamId])
 
-  // プロジェクトIDからカラーを取得する関数
+  // ========================================
+  // プロジェクトIDからカラーを取得
+  // ========================================
   const getProjectColor = (projectId) => {
     if (!projectId) return null
     const project = projects.find(p => p.id === projectId)
     return project ? project.color_code : null
   }
 
+  // ========================================
   // タスク一覧を取得
+  // ========================================
   const fetchTasks = async () => {
     if (!teamId) return
 
@@ -472,7 +409,9 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     fetchTasks()
   }, [teamId, currentProject])
 
-  // タスク作成フォーム送信（モーダルを開く）
+  // ========================================
+  // タスク作成フォーム送信
+  // ========================================
   const handleTaskInputSubmit = (e) => {
     e.preventDefault()
     if (!newTaskName.trim()) return
@@ -481,7 +420,7 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
       task_name: newTaskName,
       memo: '',
       due_date: '',
-      due_time: '',  // ✅ 空にする！
+      due_time: '',
       priority_time_frame: '今日',
       is_important: false,
       is_pinned: false,
@@ -490,8 +429,9 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     setShowCreateModal(true)
   }
 
-
-  // タスク作成（モーダルから保存）
+  // ========================================
+  // タスク作成
+  // ========================================
   const createTask = async () => {
     if (!newTaskData.task_name.trim()) return
 
@@ -539,7 +479,9 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     }
   }
 
+  // ========================================
   // タスク完了切り替え
+  // ========================================
   const toggleTask = async (taskId, isCompleted, e) => {
     e.stopPropagation()
 
@@ -570,7 +512,9 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     }
   }
 
+  // ========================================
   // 重要マークの切り替え
+  // ========================================
   const toggleImportant = async (taskId, isImportant) => {
     setTasks(tasks.map(task =>
       task.id === taskId
@@ -593,7 +537,9 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     }
   }
 
+  // ========================================
   // ピン留めの切り替え
+  // ========================================
   const togglePin = async (taskId, isPinned) => {
     setTasks(tasks.map(task =>
       task.id === taskId
@@ -616,7 +562,9 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     }
   }
 
+  // ========================================
   // タスク削除
+  // ========================================
   const deleteTask = async (taskId, e) => {
     e.stopPropagation()
 
@@ -638,7 +586,9 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     }, 100)
   }
 
+  // ========================================
   // 担当者名を取得
+  // ========================================
   const getAssigneeNames = (assigneesJson) => {
     try {
       const assigneeIds = JSON.parse(assigneesJson || '[]')
@@ -652,8 +602,9 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
       return []
     }
   }
-
+  // ========================================
   // 時間枠ごとにグループ化
+  // ========================================
   const groupedTasks = timeFrames.reduce((acc, timeFrame) => {
     acc[timeFrame] = tasks.filter(task => task.priority_time_frame === timeFrame)
     return acc
@@ -665,12 +616,16 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     ...tasks.map(t => t.id)
   ]
 
+  // ========================================
   // ドラッグ開始
+  // ========================================
   const handleDragStart = (event) => {
     setActiveId(event.active.id)
   }
 
+  // ========================================
   // ドラッグ終了時の処理
+  // ========================================
   const handleDragEnd = async (event) => {
     const { active, over } = event
 
@@ -751,72 +706,43 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
     }
   }
 
+  // ========================================
+  // ローディング表示
+  // ========================================
   if (loading) {
-    return <div style={{ textAlign: 'center', padding: '40px' }}>読み込み中...⏳</div>
+    return (
+      <div className="task-loading">
+        読み込み中...⏳
+      </div>
+    )
   }
 
   const activeTask = activeId ? tasks.find(t => t.id === activeId) : null
 
+  // ========================================
+  // JSX return
+  // ========================================
   return (
     <div>
       {/* タスク作成フォーム */}
-      <form onSubmit={handleTaskInputSubmit} style={{ marginBottom: '30px' }}>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <input
-            type="text"
-            placeholder="新しいタスクを入力してね！"
-            value={newTaskName}
-            onChange={(e) => setNewTaskName(e.target.value)}
-            style={{
-              flex: 1,
-              padding: '12px',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              fontSize: '16px'
-            }}
-          />
-          <button
-            type="submit"
-            style={{
-              padding: '12px 24px',
-              backgroundColor: '#ff69b4',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              cursor: 'pointer'
-            }}
-          >
-            追加 ➕
-          </button>
-        </div>
+      <form onSubmit={handleTaskInputSubmit} className="task-create-form">
+        <input
+          type="text"
+          placeholder="新しいタスクを入力してね！"
+          value={newTaskName}
+          onChange={(e) => setNewTaskName(e.target.value)}
+          className="input-text task-input"
+        />
+        <button type="submit" className="btn btn-primary">
+          追加 ➕
+        </button>
       </form>
 
       {/* Undo通知 */}
       {undoStack.length > 0 && (
-        <div style={{
-          padding: '10px',
-          backgroundColor: '#fff3cd',
-          border: '1px solid #ffc107',
-          borderRadius: '8px',
-          marginBottom: '20px',
-          fontSize: '13px',
-          color: '#856404',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
+        <div className="undo-notification">
           <span>💡 間違えた？ <strong>Command + Z</strong>（Ctrl + Z）で戻せるよ！</span>
-          <span style={{
-            backgroundColor: '#ffc107',
-            color: 'white',
-            padding: '2px 8px',
-            borderRadius: '10px',
-            fontSize: '11px'
-          }}>
-            {undoStack.length}
-          </span>
+          <span className="undo-count">{undoStack.length}</span>
         </div>
       )}
 
@@ -828,45 +754,23 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
         onDragEnd={handleDragEnd}
       >
         <SortableContext items={allItems}>
-
           {tasks.length === 0 ? (
-            <p style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
+            <p className="task-empty-message">
               タスクがないよ！上から追加してね〜！✨
             </p>
           ) : (
             timeFrames.map(timeFrame => (
-              <div key={timeFrame} style={{ marginBottom: '30px' }}>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '12px 15px',
-                  backgroundColor: '#f8f9fa',
-                  borderRadius: '8px',
-                  marginBottom: '10px',
-                  fontWeight: 'bold',
-                  fontSize: '15px',
-                  color: '#555'
-                }}>
-                  <span style={{ color: '#ff69b4' }}>{timeFrame}</span>
-                  <span style={{
-                    backgroundColor: '#ffe6f2',
-                    color: '#ff69b4',
-                    padding: '2px 8px',
-                    borderRadius: '10px',
-                    fontSize: '12px'
-                  }}>
+              <div key={timeFrame} className="timeframe-section">
+                {/* 時間枠ヘッダー */}
+                <div className="timeframe-header">
+                  <span className="timeframe-label">{timeFrame}</span>
+                  <span className="timeframe-count">
                     {groupedTasks[timeFrame].length}
                   </span>
                 </div>
 
-                <div style={{
-                  backgroundColor: '#fff',
-                  borderRadius: '12px',
-                  overflow: 'hidden',
-                  border: '1px solid #eee',
-                  minHeight: '60px'
-                }}>
+                {/* タスクカードコンテナ */}
+                <div className="timeframe-tasks">
                   <DroppableTimeFrame
                     timeFrame={timeFrame}
                     tasks={groupedTasks[timeFrame]}
@@ -885,25 +789,11 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
           )}
         </SortableContext>
 
-        <DragOverlay
-          dropAnimation={null}
-          style={{
-            position: 'fixed',  // 🔥 追加
-            zIndex: 9999  // 🔥 追加
-          }}
-        >
+        {/* ドラッグオーバーレイ */}
+        <DragOverlay dropAnimation={null}>
           {activeTask ? (
-            <div style={{
-              padding: '15px',
-              backgroundColor: 'white',
-              borderRadius: '12px',
-              boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
-              border: '2px solid #ff69b4',
-              opacity: 0.9,
-              cursor: 'grabbing',  // 🔥 追加
-              pointerEvents: 'none'  // 🔥 追加
-            }}>
-              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+            <div className="drag-overlay">
+              <div className="drag-overlay-content">
                 {activeTask.task_name}
               </div>
             </div>
@@ -923,89 +813,40 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
 
       {/* タスク作成モーダル */}
       {showCreateModal && createPortal(
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 1000,
-          padding: '20px'
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            padding: '30px',
-            borderRadius: '16px',
-            width: '100%',
-            maxWidth: '600px',
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
-          }}>
-            <h2 style={{ marginTop: 0, marginBottom: '20px' }}>新しいタスク 📝</h2>
+        <div className="modal-overlay">
+          <div className="modal-content task-create-modal">
+            <h2 className="modal-title">新しいタスク 📝</h2>
 
             {/* タスク名 */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                タスク名
-              </label>
+            <div className="form-group">
+              <label className="form-label">タスク名</label>
               <input
                 type="text"
                 value={newTaskData.task_name}
                 onChange={(e) => setNewTaskData({ ...newTaskData, task_name: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  boxSizing: 'border-box'
-                }}
+                className="input-text"
               />
             </div>
 
             {/* メモ */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                メモ
-              </label>
+            <div className="form-group">
+              <label className="form-label">メモ</label>
               <textarea
                 value={newTaskData.memo}
                 onChange={(e) => setNewTaskData({ ...newTaskData, memo: e.target.value })}
                 rows="3"
                 placeholder="詳細なメモを入力..."
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  boxSizing: 'border-box',
-                  resize: 'vertical'
-                }}
+                className="input-textarea"
               />
             </div>
 
             {/* 優先度 */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                優先度（時間枠）
-              </label>
+            <div className="form-group">
+              <label className="form-label">優先度（時間枠）</label>
               <select
                 value={newTaskData.priority_time_frame}
                 onChange={(e) => setNewTaskData({ ...newTaskData, priority_time_frame: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  boxSizing: 'border-box'
-                }}
+                className="input-select"
               >
                 {timeFrames.map(tf => (
                   <option key={tf} value={tf}>{tf}</option>
@@ -1014,40 +855,24 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
             </div>
 
             {/* 期日 */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                期日
-              </label>
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+            <div className="form-group">
+              <label className="form-label">期日</label>
+              <div className="form-row">
                 <input
                   type="date"
                   value={newTaskData.due_date}
                   onChange={(e) => setNewTaskData({ ...newTaskData, due_date: e.target.value })}
-                  style={{
-                    flex: 1,
-                    padding: '12px',
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                    fontSize: '16px'
-                  }}
+                  className="input-text"
                 />
                 <select
                   value={newTaskData.due_time}
                   onChange={(e) => setNewTaskData({ ...newTaskData, due_time: e.target.value })}
                   onFocus={(e) => {
-                    // ✅ 初回クリック時のみ、空なら17:00にする
                     if (newTaskData.due_time === '') {
                       setNewTaskData({ ...newTaskData, due_time: '17:00' })
                     }
                   }}
-                  style={{
-                    flex: 1,
-                    padding: '12px',
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    backgroundColor: 'white'
-                  }}
+                  className="input-select"
                 >
                   <option value="">時間なし</option>
                   {Array.from({ length: 48 }, (_, i) => {
@@ -1066,16 +891,7 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
                 <button
                   type="button"
                   onClick={() => setNewTaskData({ ...newTaskData, due_date: '', due_time: '' })}
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#f0f0f0',
-                    color: '#666',
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    width: '100%'
-                  }}
+                  className="btn btn-clear-date"
                 >
                   🗑️ 期日をクリア
                 </button>
@@ -1083,52 +899,42 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
             </div>
 
             {/* 重要マーク・ピン留め */}
-            <div style={{ marginBottom: '20px', display: 'flex', gap: '20px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <div className="form-group form-checkbox-group">
+              <label className="form-checkbox-label">
                 <input
                   type="checkbox"
                   checked={newTaskData.is_important}
                   onChange={(e) => setNewTaskData({ ...newTaskData, is_important: e.target.checked })}
-                  style={{ width: '20px', height: '20px' }}
+                  className="form-checkbox"
                 />
-                <span style={{ fontSize: '20px' }}>{newTaskData.is_important ? '⭐' : '☆'}</span>
+                <span className="form-checkbox-icon">
+                  {newTaskData.is_important ? '⭐' : '☆'}
+                </span>
                 重要マーク
               </label>
 
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+              <label className="form-checkbox-label">
                 <input
                   type="checkbox"
                   checked={newTaskData.is_pinned}
                   onChange={(e) => setNewTaskData({ ...newTaskData, is_pinned: e.target.checked })}
-                  style={{ width: '20px', height: '20px' }}
+                  className="form-checkbox"
                 />
                 📌 ピン留め
               </label>
             </div>
 
             {/* 担当者 */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                担当者
-              </label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+            <div className="form-group">
+              <label className="form-label">担当者</label>
+              <div className="assignee-selection">
                 {members.length === 0 ? (
-                  <p style={{ color: '#999', fontSize: '14px' }}>メンバーがいません</p>
+                  <p className="no-members-message">メンバーがいません</p>
                 ) : (
                   members.map(member => (
                     <label
                       key={member.id}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                        padding: '8px 12px',
-                        backgroundColor: newTaskData.assignees.includes(member.id) ? '#ff69b4' : '#f0f0f0',
-                        color: newTaskData.assignees.includes(member.id) ? 'white' : '#555',
-                        borderRadius: '20px',
-                        cursor: 'pointer',
-                        fontSize: '14px'
-                      }}
+                      className={`assignee-option ${newTaskData.assignees.includes(member.id) ? 'selected' : ''}`}
                     >
                       <input
                         type="checkbox"
@@ -1148,12 +954,10 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
                         }}
                         style={{ display: 'none' }}
                       />
-                      <div style={{
-                        width: '12px',
-                        height: '12px',
-                        borderRadius: '50%',
-                        backgroundColor: member.color
-                      }} />
+                      <div
+                        className="assignee-color"
+                        style={{ backgroundColor: member.color }}
+                      />
                       {member.name}
                     </label>
                   ))
@@ -1162,35 +966,19 @@ export default function TaskList({ session, teamId, currentProject, projects }) 
             </div>
 
             {/* ボタン */}
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+            <div className="modal-actions">
               <button
                 onClick={() => {
                   setShowCreateModal(false)
                   setNewTaskName('')
                 }}
-                style={{
-                  padding: '12px 24px',
-                  backgroundColor: '#f0f0f0',
-                  color: '#555',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold'
-                }}
+                className="btn"
               >
                 キャンセル
               </button>
               <button
                 onClick={createTask}
-                style={{
-                  padding: '12px 24px',
-                  backgroundColor: '#ff69b4',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold'
-                }}
+                className="btn btn-primary"
               >
                 作成
               </button>

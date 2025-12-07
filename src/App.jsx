@@ -11,8 +11,8 @@ import ProjectSettings from './components/ProjectSettings'
 // 🔥 PWA判定ユーティリティをインポート
 import { isPWAMode, watchPWAMode, logPWAInfo, getPWAInfo } from './utils/pwaDetector'
 
-// 🔥 PWA専用CSSをインポート
-import './pwa.css'
+// 🔥 統合CSSをインポート
+import './styles/index.css'
 
 function App() {
   const [session, setSession] = useState(null)
@@ -76,7 +76,6 @@ function App() {
       console.log('✅ オンラインに復帰しました')
 
       if (isPWA) {
-        // オンライン復帰時の処理（将来的に同期処理など）
         alert('オンラインに復帰しました！')
       }
     }
@@ -113,6 +112,7 @@ function App() {
     }
   }, [isPWA, pwaInfo, isOnline])
 
+  // 認証状態の監視
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
@@ -128,6 +128,7 @@ function App() {
     return () => subscription.unsubscribe()
   }, [])
 
+  // チームID取得
   useEffect(() => {
     if (!session) return
 
@@ -146,6 +147,7 @@ function App() {
     getTeamId()
   }, [session])
 
+  // プロジェクト一覧取得
   const fetchProjects = async () => {
     if (!teamId) return
 
@@ -166,6 +168,7 @@ function App() {
     fetchProjects()
   }, [teamId])
 
+  // 現在のプロジェクト情報を取得
   const getCurrentProjectInfo = () => {
     if (!currentProject) return null
     return projects.find(p => p.id === currentProject)
@@ -173,6 +176,7 @@ function App() {
 
   const currentProjectInfo = getCurrentProjectInfo()
 
+  // リフレッシュ処理
   const handleRefresh = async () => {
     console.log('🔄 リフレッシュ開始...')
     await fetchProjects()
@@ -180,40 +184,23 @@ function App() {
     console.log('✅ リフレッシュ完了！')
   }
 
+  // ローディング画面
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        fontSize: '20px',
-        color: '#ff69b4'
-      }}>
+      <div className="loading-screen">
         読み込み中...⏳
       </div>
     )
   }
 
+  // 未ログイン時
   if (!session) {
     return <Auth />
   }
 
+  // メイン画面
   return (
-    <div className="app-container" style={{
-      minHeight: '100vh',
-      backgroundColor: '#f0f2f5',
-      display: 'flex',
-      justifyContent: 'center',
-      padding: '20px'
-    }}>
-      {/* 🔥 PWAインジケーター（開発用） */}
-      {isPWA && process.env.NODE_ENV === 'development' && (
-        <div className="pwa-indicator">
-          🔥 PWA Mode
-        </div>
-      )}
-
+    <div className="app-container">
       {/* 🔥 オフラインインジケーター */}
       {isPWA && !isOnline && (
         <div className="offline-indicator">
@@ -221,45 +208,22 @@ function App() {
         </div>
       )}
 
-      <div style={{
-        width: '100%',
-        maxWidth: '1200px'
-      }}>
-        {/* ヘッダー */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '30px',
-          flexWrap: 'wrap',
-          gap: '10px'
-        }}>
-          <h1 style={{
-            color: '#ff69b4',
-            margin: 0,
-            fontSize: '32px'
-          }}>
+      <div className="app-wrapper">
+        {/* ========== ヘッダー ========== */}
+        <header className="app-header">
+          <h1 className="app-title">
             stay-focus 🔥
+            {/* 🔥 PWAモード時のみ表示 */}
+            {isPWA && (
+              <span className="pwa-indicator-subtitle">for PWA</span>
+            )}
           </h1>
 
-          <div style={{
-            display: 'flex',
-            gap: '10px',
-            flexWrap: 'wrap'
-          }}>
+          <div className="header-buttons">
             {currentProject && (
               <button
                 onClick={() => setShowProjectSettings(true)}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: 'white',
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  fontSize: '14px',
-                  whiteSpace: 'nowrap'
-                }}
+                className="btn"
               >
                 ⚙️ プロジェクト設定
               </button>
@@ -267,48 +231,21 @@ function App() {
 
             <button
               onClick={() => setShowArchive(true)}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: 'white',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                fontSize: '14px',
-                whiteSpace: 'nowrap'
-              }}
+              className="btn"
             >
               📦 アーカイブ
             </button>
 
             <button
               onClick={() => setShowReport(true)}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: 'white',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                fontSize: '14px',
-                whiteSpace: 'nowrap'
-              }}
+              className="btn"
             >
               📊 レポート
             </button>
 
             <button
               onClick={() => setShowMemberManagement(true)}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: 'white',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                fontSize: '14px',
-                whiteSpace: 'nowrap'
-              }}
+              className="btn"
             >
               👥 メンバー管理
             </button>
@@ -319,29 +256,16 @@ function App() {
                 if (!confirmed) return
                 await supabase.auth.signOut()
               }}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: 'white',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                fontSize: '14px',
-                whiteSpace: 'nowrap'
-              }}
+              className="btn"
             >
               ログアウト
             </button>
           </div>
-        </div>
+        </header>
 
-        {/* メインコンテンツ */}
-        <div className="main-content" style={{
-          backgroundColor: 'white',
-          padding: '30px',
-          borderRadius: '16px',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-        }}>
+        {/* ========== メインコンテンツ ========== */}
+        <main className="main-content">
+          {/* プロジェクト一覧・タブ */}
           <ProjectList
             teamId={teamId}
             currentProject={currentProject}
@@ -350,30 +274,25 @@ function App() {
             onUpdate={fetchProjects}
           />
 
+          {/* プロジェクト説明 */}
           {currentProjectInfo && currentProjectInfo.description && (
-            <div style={{
-              backgroundColor: `${currentProjectInfo.color_code}15`,
-              padding: '15px',
-              borderRadius: '12px',
-              marginBottom: '20px',
-              boxShadow: '0 2px 5px rgba(0, 0, 0, 0.05)',
-              borderLeft: `5px solid ${currentProjectInfo.color_code}`,
-              color: '#555',
-              fontSize: '14px',
-              lineHeight: '1.5'
-            }}>
+            <div
+              className="project-description"
+              style={{
+                backgroundColor: `${currentProjectInfo.color_code}15`,
+                borderLeft: `5px solid ${currentProjectInfo.color_code}`
+              }}
+            >
               {currentProjectInfo.description}
             </div>
           )}
 
-          <h2 style={{
-            marginTop: 0,
-            marginBottom: '20px',
-            fontSize: '24px'
-          }}>
+          {/* サブタイトル */}
+          <h2 className="app-subtitle">
             {currentProject ? 'プロジェクトのタスク' : 'すべてのタスク'} 📝
           </h2>
 
+          {/* タスク一覧 */}
           <TaskList
             key={refreshKey}
             session={session}
@@ -383,13 +302,7 @@ function App() {
           />
 
           {/* 更新ボタン */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginTop: '30px',
-            paddingTop: '20px',
-            borderTop: '1px solid #eee'
-          }}>
+          <div className="refresh-section">
             <button
               onClick={async () => {
                 const btn = document.getElementById('refresh-btn')
@@ -408,44 +321,16 @@ function App() {
                 }, 1000)
               }}
               id="refresh-btn"
-              style={{
-                padding: '14px 32px',
-                backgroundColor: '#ff69b4',
-                color: 'white',
-                border: 'none',
-                borderRadius: '12px',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(255, 105, 180, 0.3)',
-                transition: 'all 0.3s',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-              onMouseEnter={(e) => {
-                if (!e.target.disabled) {
-                  e.target.style.backgroundColor = '#ff1493'
-                  e.target.style.transform = 'translateY(-2px)'
-                  e.target.style.boxShadow = '0 4px 12px rgba(255, 105, 180, 0.4)'
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!e.target.disabled) {
-                  e.target.style.backgroundColor = '#ff69b4'
-                  e.target.style.transform = 'translateY(0)'
-                  e.target.style.boxShadow = '0 2px 8px rgba(255, 105, 180, 0.3)'
-                }
-              }}
+              className="btn btn-primary refresh-btn"
             >
-              <span style={{ fontSize: '18px' }}>🔄</span>
+              <span className="refresh-icon">🔄</span>
               最新の状態に更新
             </button>
           </div>
-        </div>
+        </main>
       </div>
 
-      {/* モーダル群 */}
+      {/* ========== モーダル群 ========== */}
       {showMemberManagement && (
         <MemberManagement
           teamId={teamId}

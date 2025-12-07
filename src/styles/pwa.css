@@ -1,0 +1,114 @@
+/* =========================================
+   PWA専用スタイル（上書き専用）
+   ========================================= */
+
+/* ========================================
+   🚫 テキスト選択・タップ無効化
+   ======================================== */
+
+.pwa-mode {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+/* 入力欄だけ選択可能 */
+.pwa-mode input,
+.pwa-mode textarea {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
+
+/* モーダル・レポート内も選択可能 */
+.pwa-mode .modal-content,
+.pwa-mode .modal-content *,
+.pwa-mode .report-content,
+.pwa-mode .report-content * {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
+
+/* ========================================
+   📱 横スクロール防止
+   ======================================== */
+
+.pwa-mode,
+.pwa-mode body,
+.pwa-mode #root {
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+.pwa-mode * {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* ========================================
+   🎯 スクロールバー非表示
+   ======================================== */
+
+.pwa-mode ::-webkit-scrollbar {
+    display: none;
+}
+
+.pwa-mode * {
+    scrollbar-width: none;
+}
+
+/* ========================================
+   🍎 iOS対応
+   ======================================== */
+
+@supports (-webkit-touch-callout: none) {
+    body.pwa-mode {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+    }
+
+    .pwa-mode #root {
+        overflow-y: auto;
+        height: 100vh;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* ========================================
+   📡 オフラインインジケーター
+   ======================================== */
+
+.offline-indicator {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff6b6b;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: slideInBottom 0.5s ease-out;
+}
+
+.offline-indicator.online {
+    background: #51cf66;
+}
+
+@keyframes slideInBottom {
+    from {
+        transform: translateX(-50%) translateY(100px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
