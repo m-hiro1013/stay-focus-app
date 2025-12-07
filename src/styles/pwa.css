@@ -1,28 +1,51 @@
 /* =========================================
-   PWA専用スタイル（上書き専用）
+   PWA専用スタイル（完全集約・最適化版）
+   すべてのPWA関連スタイルをこのファイルに集約
    ========================================= */
 
 /* ========================================
-   🚫 テキスト選択・タップ無効化
+   🎨 CSS変数の定義・上書き
    ======================================== */
 
 .pwa-mode {
+    /* フォントサイズ（PWA専用） */
+    --font-size-h1: 24px;
+    --font-size-h2: 20px;
+    --font-size-task-name: 18px;
+    --font-size-task-memo: 11px;
+    --font-size-task-meta: 10px;
+
+    /* 余白（PWA専用） */
+    --spacing-content: 20px;
+    --spacing-card: 12px 10px;
+}
+
+/* ========================================
+   🚫 ユーザー操作の制御
+   ======================================== */
+
+.pwa-mode {
+    /* テキスト選択を無効化（誤操作防止） */
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+
+    /* タップハイライトを無効化 */
     -webkit-tap-highlight-color: transparent;
+
+    /* 長押しメニューを無効化 */
     -webkit-touch-callout: none;
 }
 
-/* 入力欄だけ選択可能 */
+/* 入力欄だけテキスト選択を有効化 */
 .pwa-mode input,
 .pwa-mode textarea {
     user-select: text !important;
     -webkit-user-select: text !important;
 }
 
-/* モーダル・レポート内も選択可能 */
+/* モーダル・レポート内もテキスト選択を有効化 */
 .pwa-mode .modal-content,
 .pwa-mode .modal-content *,
 .pwa-mode .report-content,
@@ -32,10 +55,10 @@
 }
 
 /* ========================================
-   📱 横スクロール防止（根本修正）
+   📱 横スクロール完全防止
    ======================================== */
 
-/* html要素の設定（最上位） */
+/* HTML要素を固定（最上位） */
 html.pwa-mode {
     width: 100%;
     height: 100%;
@@ -43,7 +66,7 @@ html.pwa-mode {
     position: fixed;
 }
 
-/* body要素の設定 */
+/* Body要素を固定 */
 body.pwa-mode {
     width: 100%;
     height: 100%;
@@ -53,7 +76,7 @@ body.pwa-mode {
     padding: 0;
 }
 
-/* root要素の設定（スクロール可能領域） */
+/* Root要素のみスクロール可能 */
 .pwa-mode #root {
     width: 100%;
     height: 100%;
@@ -63,22 +86,170 @@ body.pwa-mode {
     position: relative;
 }
 
-/* 全要素の幅制限 */
+/* すべての要素の幅を制限 */
 .pwa-mode * {
-    max-width: 100%;
+    max-width: 100vw;
     box-sizing: border-box;
+    scrollbar-width: none;
 }
 
-/* ========================================
-   🎯 スクロールバー非表示
-   ======================================== */
-
+/* スクロールバーを非表示 */
 .pwa-mode ::-webkit-scrollbar {
     display: none;
 }
 
-.pwa-mode * {
-    scrollbar-width: none;
+/* ========================================
+   🎯 レイアウト構造の上書き
+   ======================================== */
+
+/* アプリコンテナ */
+.pwa-mode .app-container {
+    min-height: 100%;
+    max-width: 100vw;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    padding-top: max(env(safe-area-inset-top), 20px);
+    padding-bottom: max(env(safe-area-inset-bottom), 20px);
+    padding-left: max(env(safe-area-inset-left), 0);
+    padding-right: max(env(safe-area-inset-right), 0);
+    overflow-x: hidden;
+}
+
+/* メインラッパー */
+.pwa-mode .app-wrapper {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* メインコンテンツ */
+.pwa-mode .main-content {
+    width: 100%;
+    max-width: 100%;
+    padding: var(--spacing-content);
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+/* ========================================
+   📐 特定要素の幅制限
+   ======================================== */
+
+.pwa-mode .app-header,
+.pwa-mode .project-tabs-container,
+.pwa-mode .project-tabs,
+.pwa-mode .task-card,
+.pwa-mode .timeframe-tasks {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* ========================================
+   🔘 ボタン
+   ======================================== */
+
+.pwa-mode .btn {
+    font-size: 12px;
+    padding: 12px 16px;
+    min-height: 44px;
+}
+
+/* ========================================
+   📝 タスクカード
+   ======================================== */
+
+.pwa-mode .task-card {
+    padding: var(--spacing-card);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.pwa-mode .task-card:active {
+    background-color: #f0f0f0;
+    transform: scale(0.98);
+}
+
+/* ========================================
+   🎨 アイコン
+   ======================================== */
+
+/* ドラッグハンドル */
+.pwa-mode .icon-drag {
+    font-size: 20px;
+}
+
+/* 削除ボタン（アイコン表示に変更） */
+.pwa-mode .icon-delete {
+    background-color: transparent;
+    color: var(--color-text-tertiary);
+    padding: 8px;
+    font-size: 18px;
+}
+
+.pwa-mode .icon-delete:active {
+    color: var(--color-danger);
+    transform: scale(1.1);
+}
+
+/* 削除ボタンのテキスト/アイコン切り替え */
+.pwa-mode .delete-text {
+    display: none;
+}
+
+.pwa-mode .delete-icon {
+    display: inline;
+}
+
+/* ========================================
+   📥 フォーム入力欄
+   ======================================== */
+
+/* 自動ズーム防止（iOS対策） */
+.pwa-mode .input-text,
+.pwa-mode .input-textarea,
+.pwa-mode .input-select {
+    font-size: 16px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* ========================================
+   🗂️ プロジェクトタブ
+   ======================================== */
+
+.pwa-mode .project-tabs-container {
+    width: 100%;
+    overflow: hidden;
+}
+
+.pwa-mode .project-tabs {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.pwa-mode .project-tab {
+    font-size: 13px;
+    padding: 8px 12px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+}
+
+/* ========================================
+   🪟 モーダル
+   ======================================== */
+
+.pwa-mode .modal-overlay {
+    padding: 16px;
+}
+
+.pwa-mode .modal-content {
+    width: 100%;
+    max-width: 100%;
+    padding: 16px;
+    max-height: 85vh;
+    box-sizing: border-box;
 }
 
 /* ========================================

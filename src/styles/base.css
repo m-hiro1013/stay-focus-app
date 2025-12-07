@@ -53,22 +53,6 @@
     --transition-normal: 0.3s ease;
 }
 
-/* PWAモード用の変数上書き */
-.pwa-mode {
-    /* フォントサイズ（PWA専用） */
-    --font-size-h1: 24px;
-    --font-size-h2: 20px;
-    --font-size-task-name: 18px;
-    --font-size-task-memo: 11px;
-    --font-size-task-meta: 10px;
-    --font-size-button: 12px;
-    --font-size-tab: 13px;
-
-    /* 余白（PWA専用） */
-    --spacing-content: 20px;
-    --spacing-card: 12px 10px;
-}
-
 /* リセット */
 * {
     box-sizing: border-box;

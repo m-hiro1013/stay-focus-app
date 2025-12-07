@@ -9,6 +9,9 @@
     display: flex;
     justify-content: center;
     padding: var(--spacing-xl);
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 /* メインラッパー */
@@ -40,31 +43,4 @@
     padding: var(--spacing-xxl);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-md);
-}
-
-/* ========================================
-   PWAモード時の上書き
-   ======================================== */
-
-.pwa-mode .app-container {
-    min-height: 100%;
-    padding: 0;
-    padding-top: max(env(safe-area-inset-top), var(--spacing-xl));
-    padding-bottom: max(env(safe-area-inset-bottom), var(--spacing-xl));
-    padding-left: max(env(safe-area-inset-left), 0);
-    padding-right: max(env(safe-area-inset-right), 0);
-}
-
-.pwa-mode .app-wrapper {
-    width: 100%;
-    max-width: 100%;
-}
-
-.pwa-mode .main-content {
-    width: 100%;
-    max-width: 100%;
-    padding: var(--spacing-content);
-    margin: 0;
-    border-radius: 0;
-    box-shadow: none;
 }
