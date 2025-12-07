@@ -8,6 +8,12 @@ import Report from './components/Report'
 import ArchiveList from './components/ArchiveList'
 import ProjectSettings from './components/ProjectSettings'
 
+// 🔥 PWA判定ユーティリティをインポート
+import { isPWAMode, watchPWAMode, logPWAInfo, getPWAInfo } from './utils/pwaDetector'
+
+// 🔥 PWA専用CSSをインポート
+import './pwa.css'
+
 function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -18,9 +24,94 @@ function App() {
   const [showArchive, setShowArchive] = useState(false)
   const [showProjectSettings, setShowProjectSettings] = useState(false)
   const [projects, setProjects] = useState([])
-
-  // 🔥 リフレッシュ用のキーを追加
   const [refreshKey, setRefreshKey] = useState(0)
+
+  // 🔥 PWA判定のstate
+  const [isPWA, setIsPWA] = useState(false)
+  const [pwaInfo, setPWAInfo] = useState(null)
+  const [isOnline, setIsOnline] = useState(navigator.onLine)
+
+  // 🔥 PWAモード判定
+  useEffect(() => {
+    // 初回判定
+    const checkPWA = () => {
+      const pwaMode = isPWAMode()
+      const info = getPWAInfo()
+
+      setIsPWA(pwaMode)
+      setPWAInfo(info)
+
+      // bodyにクラス追加
+      if (pwaMode) {
+        document.body.classList.add('pwa-mode')
+        console.log('🔥 PWAモードで動作中')
+        logPWAInfo()
+      } else {
+        document.body.classList.remove('pwa-mode')
+        console.log('🌐 Webモードで動作中')
+      }
+    }
+
+    checkPWA()
+
+    // display-mode変更を監視
+    const cleanup = watchPWAMode((isPWAMode) => {
+      setIsPWA(isPWAMode)
+      if (isPWAMode) {
+        document.body.classList.add('pwa-mode')
+        console.log('🔥 PWAモードに切り替わりました')
+      } else {
+        document.body.classList.remove('pwa-mode')
+        console.log('🌐 Webモードに切り替わりました')
+      }
+    })
+
+    return cleanup
+  }, [])
+
+  // 🔥 オンライン/オフライン監視
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true)
+      console.log('✅ オンラインに復帰しました')
+
+      if (isPWA) {
+        // オンライン復帰時の処理（将来的に同期処理など）
+        alert('オンラインに復帰しました！')
+      }
+    }
+
+    const handleOffline = () => {
+      setIsOnline(false)
+      console.log('❌ オフラインになりました')
+
+      if (isPWA) {
+        alert('オフラインモードです')
+      }
+    }
+
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [isPWA])
+
+  // 🔥 開発用：グローバルにPWA情報を公開
+  useEffect(() => {
+    window.__STAY_FOCUS_PWA__ = {
+      isPWA,
+      pwaInfo,
+      isOnline,
+      togglePWAMode: () => {
+        setIsPWA(!isPWA)
+        console.log('🔧 PWAモードを手動切替:', !isPWA)
+      },
+      showInfo: logPWAInfo
+    }
+  }, [isPWA, pwaInfo, isOnline])
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -82,16 +173,10 @@ function App() {
 
   const currentProjectInfo = getCurrentProjectInfo()
 
-  // 🔥 リフレッシュ関数
   const handleRefresh = async () => {
     console.log('🔄 リフレッシュ開始...')
-
-    // プロジェクト一覧を再取得
     await fetchProjects()
-
-    // タスク一覧も強制的に再レンダリング
     setRefreshKey(prev => prev + 1)
-
     console.log('✅ リフレッシュ完了！')
   }
 
@@ -114,21 +199,32 @@ function App() {
     return <Auth />
   }
 
-  // ログイン済みの場合 → メイン画面を表示
   return (
-    <div style={{
+    <div className="app-container" style={{
       minHeight: '100vh',
       backgroundColor: '#f0f2f5',
       display: 'flex',
       justifyContent: 'center',
       padding: '20px'
     }}>
+      {/* 🔥 PWAインジケーター（開発用） */}
+      {isPWA && process.env.NODE_ENV === 'development' && (
+        <div className="pwa-indicator">
+          🔥 PWA Mode
+        </div>
+      )}
+
+      {/* 🔥 オフラインインジケーター */}
+      {isPWA && !isOnline && (
+        <div className="offline-indicator">
+          📡 オフライン
+        </div>
+      )}
 
       <div style={{
         width: '100%',
         maxWidth: '1200px'
       }}>
-
         {/* ヘッダー */}
         <div style={{
           display: 'flex',
@@ -221,7 +317,6 @@ function App() {
               onClick={async () => {
                 const confirmed = window.confirm('ログアウトしますか？')
                 if (!confirmed) return
-
                 await supabase.auth.signOut()
               }}
               style={{
@@ -241,7 +336,7 @@ function App() {
         </div>
 
         {/* メインコンテンツ */}
-        <div style={{
+        <div className="main-content" style={{
           backgroundColor: 'white',
           padding: '30px',
           borderRadius: '16px',
@@ -279,7 +374,6 @@ function App() {
             {currentProject ? 'プロジェクトのタスク' : 'すべてのタスク'} 📝
           </h2>
 
-          {/* 🔥 refreshKeyを追加して強制的に再レンダリング */}
           <TaskList
             key={refreshKey}
             session={session}
@@ -288,7 +382,7 @@ function App() {
             projects={projects}
           />
 
-          {/* 🔥 更新ボタン */}
+          {/* 更新ボタン */}
           <div style={{
             display: 'flex',
             justifyContent: 'center',
@@ -389,7 +483,6 @@ function App() {
         />
       )}
     </div>
-
   )
 }
 
