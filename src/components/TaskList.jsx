@@ -127,7 +127,7 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
         <div style={{ flex: 1, minWidth: 0 }}> {/* 🔥 minWidth: 0 でテキストの折り返しを強制 */}
           <div style={{
             fontWeight: 'bold',
-            fontSize: isMobile ? '15px' : '16px', // 🔥 スマホはタイトルを大きく
+            fontSize: isMobile ? '24px' : '24px', // 🔥 スマホはタイトルを大きく
             marginBottom: '4px',
             color: hasWarning ? '#d9534f' : 'inherit',
             display: 'flex',
@@ -187,7 +187,7 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
 
           {task.memo && (
             <div style={{
-              fontSize: isMobile ? '12px' : '13px',
+              fontSize: isMobile ? '10px' : '16px',
               color: '#666',
               marginBottom: '4px',
               wordBreak: 'break-word' // 🔥 メモも折り返す

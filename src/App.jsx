@@ -127,8 +127,8 @@ function App() {
     }}>
 
       <div style={{
-        width: isMobile ? '100%' : '80%', // 🔥 スマホは100%幅
-        maxWidth: isMobile ? '100%' : '1600px' // 🔥 スマホは制限なし
+        width: isMobile ? '90%' : '90%', // 🔥 スマホは100%幅
+        maxWidth: isMobile ? '90%' : '90%' // 🔥 スマホは制限なし
       }}>
 
         {/* ヘッダー */}
@@ -137,18 +137,18 @@ function App() {
           justifyContent: 'space-between',
           alignItems: 'center',
           marginBottom: isMobile ? '15px' : '30px',
-          flexWrap: isMobile ? 'wrap' : 'nowrap' // 🔥 スマホは折り返し
+          flexWrap: isMobile ? 'nowrap' : 'nowrap' // 🔥 スマホは折り返し
         }}>
-          <h1 style={{ 
-            color: '#ff69b4', 
+          <h1 style={{
+            color: '#ff69b4',
             margin: 0,
             fontSize: isMobile ? '24px' : '32px' // 🔥 スマホは小さめ
           }}>
             stay-focus 🔥
           </h1>
 
-          <div style={{ 
-            display: 'flex', 
+          <div style={{
+            display: 'flex',
             gap: isMobile ? '5px' : '10px',
             flexWrap: 'wrap',
             marginTop: isMobile ? '10px' : '0'
@@ -253,7 +253,7 @@ function App() {
         {/* メインコンテンツ */}
         <div style={{
           backgroundColor: 'white',
-          padding: isMobile ? '15px' : '30px', // 🔥 スマホは余白小さく
+          padding: isMobile ? '30px' : '30px', // 🔥 スマホは余白小さく
           borderRadius: '16px',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
         }}>
@@ -285,10 +285,10 @@ function App() {
           )}
 
           {/* タスク一覧 */}
-          <h2 style={{ 
-            marginTop: 0, 
+          <h2 style={{
+            marginTop: 0,
             marginBottom: '20px',
-            fontSize: isMobile ? '18px' : '24px' // 🔥 スマホは小さめ
+            fontSize: isMobile ? '24x' : '24px' // 🔥 スマホは小さめ
           }}>
             {currentProject ? 'プロジェクトのタスク' : 'すべてのタスク'} 📝
           </h2>
