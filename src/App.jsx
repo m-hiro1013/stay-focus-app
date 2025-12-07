@@ -19,20 +19,8 @@ function App() {
   const [showProjectSettings, setShowProjectSettings] = useState(false)
   const [projects, setProjects] = useState([])
 
-  // 🔥 スマホ判定
-  const [isMobile, setIsMobile] = useState(false)
-
   // 🔥 リフレッシュ用のキーを追加
   const [refreshKey, setRefreshKey] = useState(0)
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768)
-    }
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -133,12 +121,12 @@ function App() {
       backgroundColor: '#f0f2f5',
       display: 'flex',
       justifyContent: 'center',
-      padding: isMobile ? '10px' : '20px'
+      padding: '20px'
     }}>
 
       <div style={{
-        width: isMobile ? '80%' : '80%',
-        maxWidth: isMobile ? '80%' : '1200px'
+        width: '100%',
+        maxWidth: '1200px'
       }}>
 
         {/* ヘッダー */}
@@ -146,95 +134,87 @@ function App() {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: isMobile ? '15px' : '30px',
-          flexWrap: isMobile ? 'wrap' : 'nowrap'
+          marginBottom: '30px',
+          flexWrap: 'wrap',
+          gap: '10px'
         }}>
           <h1 style={{
             color: '#ff69b4',
             margin: 0,
-            fontSize: isMobile ? '24px' : '32px'
+            fontSize: '32px'
           }}>
             stay-focus 🔥
           </h1>
 
           <div style={{
             display: 'flex',
-            gap: isMobile ? '5px' : '10px',
-            flexWrap: 'wrap',
-            marginTop: isMobile ? '10px' : '0'
+            gap: '10px',
+            flexWrap: 'wrap'
           }}>
             {currentProject && (
               <button
                 onClick={() => setShowProjectSettings(true)}
                 style={{
-                  padding: isMobile ? '8px 12px' : '10px 20px',
+                  padding: '10px 20px',
                   backgroundColor: 'white',
                   border: '1px solid #ddd',
                   borderRadius: '8px',
                   cursor: 'pointer',
                   fontWeight: 'bold',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  fontSize: isMobile ? '12px' : '14px'
+                  fontSize: '14px',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                ⚙️ {isMobile ? '設定' : 'プロジェクト設定'}
+                ⚙️ プロジェクト設定
               </button>
             )}
 
             <button
               onClick={() => setShowArchive(true)}
               style={{
-                padding: isMobile ? '8px 12px' : '10px 20px',
+                padding: '10px 20px',
                 backgroundColor: 'white',
                 border: '1px solid #ddd',
                 borderRadius: '8px',
                 cursor: 'pointer',
                 fontWeight: 'bold',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
-                fontSize: isMobile ? '12px' : '14px'
+                fontSize: '14px',
+                whiteSpace: 'nowrap'
               }}
             >
-              📦 {isMobile ? '' : 'アーカイブ'}
+              📦 アーカイブ
             </button>
 
             <button
               onClick={() => setShowReport(true)}
               style={{
-                padding: isMobile ? '8px 12px' : '10px 20px',
+                padding: '10px 20px',
                 backgroundColor: 'white',
                 border: '1px solid #ddd',
                 borderRadius: '8px',
                 cursor: 'pointer',
                 fontWeight: 'bold',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
-                fontSize: isMobile ? '12px' : '14px'
+                fontSize: '14px',
+                whiteSpace: 'nowrap'
               }}
             >
-              📊 {isMobile ? '' : 'レポート'}
+              📊 レポート
             </button>
 
             <button
               onClick={() => setShowMemberManagement(true)}
               style={{
-                padding: isMobile ? '8px 12px' : '10px 20px',
+                padding: '10px 20px',
                 backgroundColor: 'white',
                 border: '1px solid #ddd',
                 borderRadius: '8px',
                 cursor: 'pointer',
                 fontWeight: 'bold',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
-                fontSize: isMobile ? '12px' : '14px'
+                fontSize: '14px',
+                whiteSpace: 'nowrap'
               }}
             >
-              👥 {isMobile ? '' : 'メンバー管理'}
+              👥 メンバー管理
             </button>
 
             <button
@@ -245,16 +225,17 @@ function App() {
                 await supabase.auth.signOut()
               }}
               style={{
-                padding: isMobile ? '8px 12px' : '10px 20px',
+                padding: '10px 20px',
                 backgroundColor: 'white',
                 border: '1px solid #ddd',
                 borderRadius: '8px',
                 cursor: 'pointer',
                 fontWeight: 'bold',
-                fontSize: isMobile ? '12px' : '14px'
+                fontSize: '14px',
+                whiteSpace: 'nowrap'
               }}
             >
-              {isMobile ? '🚪' : 'ログアウト'}
+              ログアウト
             </button>
           </div>
         </div>
@@ -262,7 +243,7 @@ function App() {
         {/* メインコンテンツ */}
         <div style={{
           backgroundColor: 'white',
-          padding: isMobile ? '15px' : '30px',
+          padding: '30px',
           borderRadius: '16px',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
         }}>
@@ -272,7 +253,6 @@ function App() {
             onProjectChange={setCurrentProject}
             projects={projects}
             onUpdate={fetchProjects}
-            isMobile={isMobile}
           />
 
           {currentProjectInfo && currentProjectInfo.description && (
@@ -294,7 +274,7 @@ function App() {
           <h2 style={{
             marginTop: 0,
             marginBottom: '20px',
-            fontSize: isMobile ? '18px' : '24px'
+            fontSize: '24px'
           }}>
             {currentProject ? 'プロジェクトのタスク' : 'すべてのタスク'} 📝
           </h2>
@@ -306,7 +286,6 @@ function App() {
             teamId={teamId}
             currentProject={currentProject}
             projects={projects}
-            isMobile={isMobile}
           />
 
           {/* 🔥 更新ボタン */}
@@ -336,12 +315,12 @@ function App() {
               }}
               id="refresh-btn"
               style={{
-                padding: isMobile ? '12px 24px' : '14px 32px',
+                padding: '14px 32px',
                 backgroundColor: '#ff69b4',
                 color: 'white',
                 border: 'none',
                 borderRadius: '12px',
-                fontSize: isMobile ? '14px' : '16px',
+                fontSize: '16px',
                 fontWeight: 'bold',
                 cursor: 'pointer',
                 boxShadow: '0 2px 8px rgba(255, 105, 180, 0.3)',

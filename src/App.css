@@ -20,9 +20,12 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }
@@ -33,5 +36,25 @@ body {
   body {
     /* スマホで拡大されすぎるのを防ぐ */
     -webkit-text-size-adjust: 100%;
+    padding: 10px;
+  }
+
+  /* タスクカードのパディング調整 */
+  .task-item {
+    padding: 12px 8px !important;
+  }
+
+  /* ボタンのフォントサイズ調整 */
+  button {
+    font-size: 13px !important;
+  }
+
+  /* タイトルサイズ調整 */
+  h1 {
+    font-size: 24px !important;
+  }
+
+  h2 {
+    font-size: 20px !important;
   }
 }

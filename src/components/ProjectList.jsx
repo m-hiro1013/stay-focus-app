@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
 
-export default function ProjectList({ teamId, currentProject, onProjectChange, projects, onUpdate, isMobile }) {
+export default function ProjectList({ teamId, currentProject, onProjectChange, projects, onUpdate }) {
   const [showModal, setShowModal] = useState(false)
   const [newProjectName, setNewProjectName] = useState('')
   const [newProjectDesc, setNewProjectDesc] = useState('')

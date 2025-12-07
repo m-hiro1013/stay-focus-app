@@ -21,7 +21,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 
 // ドラッグ可能なタスクカードコンポーネント
-function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projectColor, onToggleImportant, onTogglePin, checkTaskStatus, isMobile }) {
+function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projectColor, onToggleImportant, onTogglePin, checkTaskStatus }) {
   const {
     attributes,
     listeners,
@@ -59,8 +59,8 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: isMobile ? '8px' : '15px', // 🔥 スマホは間隔小さく
-        padding: isMobile ? '12px 8px' : '15px',
+        gap: '10px',
+        padding: '15px 10px',
         borderBottom: '1px solid #f0f0f0',
         cursor: 'pointer',
         borderLeft: projectColor ? `5px solid ${projectColor}` : 'none',
@@ -73,9 +73,10 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
           {...listeners}
           style={{
             cursor: 'grab',
-            fontSize: isMobile ? '16px' : '20px',
+            fontSize: '18px',
             color: '#999',
-            touchAction: 'none'
+            touchAction: 'none',
+            flexShrink: 0
           }}
         >
           ☰
@@ -88,12 +89,13 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
             onTogglePin(task.id, task.is_pinned)
           }}
           style={{
-            fontSize: isMobile ? '14px' : '18px',
+            fontSize: '16px',
             cursor: 'pointer',
             opacity: task.is_pinned ? 1 : 0.3,
             filter: task.is_pinned ? 'none' : 'grayscale(100%)',
             transition: 'all 0.2s',
-            userSelect: 'none'
+            userSelect: 'none',
+            flexShrink: 0
           }}
           title={task.is_pinned ? 'ピン留め解除' : 'ピン留め'}
         >
@@ -107,11 +109,12 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
             onToggleImportant(task.id, task.is_important)
           }}
           style={{
-            fontSize: isMobile ? '16px' : '20px',
+            fontSize: '18px',
             cursor: 'pointer',
             color: task.is_important ? '#FFD700' : '#e0e0e0',
             transition: 'color 0.2s',
-            userSelect: 'none'
+            userSelect: 'none',
+            flexShrink: 0
           }}
           title={task.is_important ? '重要マーク解除' : '重要マーク'}
         >
@@ -125,9 +128,10 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
           onChange={(e) => onToggle(task.id, task.is_completed, e)}
           onClick={(e) => e.stopPropagation()}
           style={{
-            width: isMobile ? '18px' : '20px',
-            height: isMobile ? '18px' : '20px',
-            cursor: 'pointer'
+            width: '18px',
+            height: '18px',
+            cursor: 'pointer',
+            flexShrink: 0
           }}
         />
 
@@ -135,7 +139,7 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
         <div style={{ flex: 1, minWidth: 0 }}> {/* 🔥 minWidth: 0 でテキストの折り返しを強制 */}
           <div style={{
             fontWeight: 'bold',
-            fontSize: isMobile ? '24px' : '24px', // 🔥 スマホはタイトルを大きく
+            fontSize: '16px',
             marginBottom: '4px',
             color: hasWarning ? '#d9534f' : 'inherit',
             display: 'flex',
@@ -146,7 +150,7 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
             {hasWarning && (
               <span
                 style={{
-                  fontSize: isMobile ? '16px' : '18px',
+                  fontSize: '16px',
                   animation: 'pulse 1.5s ease-in-out infinite',
                   flexShrink: 0 // 🔥 アイコンは縮小させない
                 }}
@@ -172,7 +176,7 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
             }}>
               {assignees.map((assignee, index) => (
                 <span key={index} style={{
-                  fontSize: isMobile ? '10px' : '11px',
+                  fontSize: '11px',
                   padding: '2px 8px',
                   backgroundColor: '#f0f0f0',
                   borderRadius: '10px',
@@ -195,7 +199,7 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
 
           {task.memo && (
             <div style={{
-              fontSize: isMobile ? '10px' : '16px',
+              fontSize: '13px',
               color: '#666',
               marginBottom: '4px',
               wordBreak: 'break-word' // 🔥 メモも折り返す
@@ -205,7 +209,7 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
           )}
           {task.due_date && (
             <div style={{
-              fontSize: isMobile ? '11px' : '12px',
+              fontSize: '12px',
               color: hasWarning ? '#d9534f' : '#999',
               fontWeight: hasWarning ? 'bold' : 'normal'
             }}>
@@ -214,22 +218,33 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
           )}
         </div>
 
-        {/* 🔥 削除ボタン（スマホではシンプルなアイコンに） */}
+        {/* ✅ 削除ボタン（PC/スマホ統一） */}
         <button
           type="button"
           onClick={(e) => onDelete(task.id, e)}
           style={{
-            padding: isMobile ? '6px' : '8px 16px',
-            backgroundColor: isMobile ? 'transparent' : '#ff4d4d',
-            color: isMobile ? '#999' : 'white',
+            padding: '8px 16px',
+            backgroundColor: '#ff4d4d',
+            color: 'white',
             border: 'none',
             borderRadius: '6px',
             cursor: 'pointer',
-            fontSize: isMobile ? '18px' : '14px',
-            flexShrink: 0 // 🔥 削除ボタンは縮小させない
+            fontSize: '14px',
+            fontWeight: '500',
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
+            transition: 'all 0.2s'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#e63939'
+            e.currentTarget.style.transform = 'translateY(-1px)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#ff4d4d'
+            e.currentTarget.style.transform = 'translateY(0)'
           }}
         >
-          {isMobile ? '🗑️' : '削除'}
+          削除
         </button>
       </div>
     </div>
@@ -237,7 +252,7 @@ function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projec
 }
 
 // ドロップ可能なグループコンテナ
-function DroppableTimeFrame({ timeFrame, tasks, assignees, onToggle, onDelete, onClick, getProjectColor, onToggleImportant, onTogglePin, checkTaskStatus, isMobile }) {
+function DroppableTimeFrame({ timeFrame, tasks, assignees, onToggle, onDelete, onClick, getProjectColor, onToggleImportant, onTogglePin, checkTaskStatus }) {
   const {
     setNodeRef,
   } = useSortable({ id: `group-${timeFrame}` })
@@ -273,7 +288,6 @@ function DroppableTimeFrame({ timeFrame, tasks, assignees, onToggle, onDelete, o
               onToggleImportant={onToggleImportant}
               onTogglePin={onTogglePin}
               checkTaskStatus={checkTaskStatus}
-              isMobile={isMobile} // 🔥 追加
             />
           ))
         )}
@@ -282,7 +296,7 @@ function DroppableTimeFrame({ timeFrame, tasks, assignees, onToggle, onDelete, o
   )
 }
 
-export default function TaskList({ session, teamId, currentProject, projects, isMobile }) {
+export default function TaskList({ session, teamId, currentProject, projects }) {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [newTaskName, setNewTaskName] = useState('')
@@ -864,7 +878,6 @@ export default function TaskList({ session, teamId, currentProject, projects, is
                     onToggleImportant={toggleImportant}
                     onTogglePin={togglePin}
                     checkTaskStatus={checkTaskStatus}
-                    isMobile={isMobile} // 🔥 追加
                   />
                 </div>
               </div>
