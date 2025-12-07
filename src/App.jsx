@@ -139,8 +139,8 @@ function App() {
       }}>
 
         <div style={{
-          width: isMobile ? '100%' : '80%',
-          maxWidth: isMobile ? '100%' : '1600px'
+          width: isMobile ? '80%' : '80%',
+          maxWidth: isMobile ? '80%' : '1200px'
         }}>
 
           {/* ヘッダー */}
