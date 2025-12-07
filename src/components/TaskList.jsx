@@ -19,7 +19,6 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { restrictToVerticalAxis, restrictToWindowEdges } from '@dnd-kit/modifiers'  // 🔥 追加
 
 // ドラッグ可能なタスクカードコンポーネント
 function SortableTaskItem({ task, assignees, onToggle, onDelete, onClick, projectColor, onToggleImportant, onTogglePin, checkTaskStatus, isMobile }) {
@@ -813,9 +812,9 @@ export default function TaskList({ session, teamId, currentProject, projects, is
         collisionDetection={closestCenter}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
-        modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}  // 🔥 追加
       >
         <SortableContext items={allItems}>
+
           {tasks.length === 0 ? (
             <p style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
               タスクがないよ！上から追加してね〜！✨

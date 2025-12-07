@@ -410,7 +410,7 @@ function App() {
         />
       )}
     </div>
-    </div >
+
   )
 }
 
