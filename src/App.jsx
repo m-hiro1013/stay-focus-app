@@ -41,13 +41,18 @@ function App() {
       setIsPWA(pwaMode)
       setPWAInfo(info)
 
-      // bodyにクラス追加
+      // html要素にもクラス追加（重要！）
+      const htmlElement = document.documentElement
+      const bodyElement = document.body
+
       if (pwaMode) {
-        document.body.classList.add('pwa-mode')
+        htmlElement.classList.add('pwa-mode')
+        bodyElement.classList.add('pwa-mode')
         console.log('🔥 PWAモードで動作中')
         logPWAInfo()
       } else {
-        document.body.classList.remove('pwa-mode')
+        htmlElement.classList.remove('pwa-mode')
+        bodyElement.classList.remove('pwa-mode')
         console.log('🌐 Webモードで動作中')
       }
     }
@@ -57,11 +62,16 @@ function App() {
     // display-mode変更を監視
     const cleanup = watchPWAMode((isPWAMode) => {
       setIsPWA(isPWAMode)
+      const htmlElement = document.documentElement
+      const bodyElement = document.body
+
       if (isPWAMode) {
-        document.body.classList.add('pwa-mode')
+        htmlElement.classList.add('pwa-mode')
+        bodyElement.classList.add('pwa-mode')
         console.log('🔥 PWAモードに切り替わりました')
       } else {
-        document.body.classList.remove('pwa-mode')
+        htmlElement.classList.remove('pwa-mode')
+        bodyElement.classList.remove('pwa-mode')
         console.log('🌐 Webモードに切り替わりました')
       }
     })

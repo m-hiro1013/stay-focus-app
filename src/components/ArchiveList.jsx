@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
 
-export default function ArchiveList({ teamId, onClose, onUpdate }) {  // ✅ onUpdate を追加！
+export default function ArchiveList({ teamId, onClose, onUpdate }) {
   const [archivedProjects, setArchivedProjects] = useState([])
   const [expandedProject, setExpandedProject] = useState(null)
   const [projectTasks, setProjectTasks] = useState({})
@@ -70,47 +70,21 @@ export default function ArchiveList({ teamId, onClose, onUpdate }) {  // ✅ onU
   }
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 1000,
-      padding: '20px'
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '30px',
-        borderRadius: '16px',
-        width: '100%',
-        maxWidth: '800px',
-        maxHeight: '90vh',
-        overflowY: 'auto',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
-      }}>
+    <div className="modal-overlay">
+      <div className="modal-content" style={{ maxWidth: '800px' }}>
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '20px'
+          marginBottom: '20px',
+          gap: '10px',
+          flexWrap: 'wrap'
         }}>
           <h2 style={{ margin: 0 }}>アーカイブ済みプロジェクト 📦</h2>
           <button
             type="button"
             onClick={onClose}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#f0f0f0',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
+            className="btn"
           >
             閉じる
           </button>
@@ -146,14 +120,16 @@ export default function ArchiveList({ teamId, onClose, onUpdate }) {  // ✅ onU
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  gap: '10px',
+                  flexWrap: 'wrap'
                 }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '5px' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '5px', wordBreak: 'break-word' }}>
                       {project.project_name}
                     </div>
                     {project.description && (
-                      <div style={{ fontSize: '13px', color: '#666' }}>
+                      <div style={{ fontSize: '13px', color: '#666', wordBreak: 'break-word' }}>
                         {project.description}
                       </div>
                     )}
@@ -164,15 +140,13 @@ export default function ArchiveList({ teamId, onClose, onUpdate }) {  // ✅ onU
                       e.stopPropagation()
                       unarchiveProject(project.id)
                     }}
+                    className="btn"
                     style={{
-                      padding: '8px 16px',
                       backgroundColor: '#4CAF50',
                       color: 'white',
-                      border: 'none',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
                       fontWeight: 'bold',
-                      fontSize: '14px'
+                      fontSize: '14px',
+                      flexShrink: 0
                     }}
                   >
                     復元
@@ -207,13 +181,17 @@ export default function ArchiveList({ teamId, onClose, onUpdate }) {  // ✅ onU
                         }}
                       >
                         <span style={{
-                          color: task.is_completed ? '#4CAF50' : '#999'
+                          color: task.is_completed ? '#4CAF50' : '#999',
+                          flexShrink: 0
                         }}>
                           {task.is_completed ? '✔' : '・'}
                         </span>
                         <span style={{
                           color: task.is_completed ? '#aaa' : '#333',
-                          textDecoration: task.is_completed ? 'line-through' : 'none'
+                          textDecoration: task.is_completed ? 'line-through' : 'none',
+                          wordBreak: 'break-word',
+                          flex: 1,
+                          minWidth: 0
                         }}>
                           {task.task_name}
                         </span>

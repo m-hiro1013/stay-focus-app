@@ -103,7 +103,7 @@ export default function Report({ teamId, onClose }) {
     }, 100)
   }
 
-  // ✅ タスク削除
+  // タスク削除
   const handleDeleteTask = async (taskId) => {
     if (!window.confirm('このタスクを削除するよん？\n振り返りコメントも一緒に消えちゃうよ！')) return
 
@@ -124,46 +124,20 @@ export default function Report({ teamId, onClose }) {
   }
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 1000,
-      padding: '20px'
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '30px',
-        borderRadius: '16px',
-        width: '100%',
-        maxWidth: '800px',
-        maxHeight: '90vh',
-        overflowY: 'auto',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
-      }}>
+    <div className="modal-overlay">
+      <div className="modal-content" style={{ maxWidth: '800px' }}>
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '20px'
+          marginBottom: '20px',
+          gap: '10px',
+          flexWrap: 'wrap'
         }}>
           <h2 style={{ margin: 0 }}>振り返りレポート 📊</h2>
           <button
             onClick={onClose}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#f0f0f0',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
+            className="btn"
           >
             閉じる
           </button>
@@ -174,42 +148,27 @@ export default function Report({ teamId, onClose }) {
           display: 'flex',
           gap: '10px',
           alignItems: 'center',
-          marginBottom: '20px'
+          marginBottom: '20px',
+          flexWrap: 'wrap'
         }}>
           <input
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            style={{
-              padding: '10px',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              fontSize: '14px'
-            }}
+            className="input-text"
+            style={{ flex: '1 1 auto', minWidth: '140px' }}
           />
           <span>〜</span>
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            style={{
-              padding: '10px',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              fontSize: '14px'
-            }}
+            className="input-text"
+            style={{ flex: '1 1 auto', minWidth: '140px' }}
           />
           <button
             onClick={fetchReport}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: '#ff69b4',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
+            className="btn btn-primary"
           >
             表示
           </button>
@@ -251,13 +210,15 @@ export default function Report({ teamId, onClose }) {
                     marginBottom: '10px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '15px'
+                    gap: '15px',
+                    flexWrap: 'wrap'
                   }}
                 >
-                  {/* ✅ タスク情報エリア */}
+                  {/* タスク情報エリア */}
                   <div
                     style={{
                       flex: 1,
+                      minWidth: 0,
                       cursor: item.type === 'task' ? 'pointer' : 'default'
                     }}
                     onClick={() => item.type === 'task' && handleEditTask(item)}
@@ -269,7 +230,8 @@ export default function Report({ teamId, onClose }) {
                           display: 'flex',
                           alignItems: 'center',
                           gap: '8px',
-                          marginBottom: '5px'
+                          marginBottom: '5px',
+                          flexWrap: 'wrap'
                         }}>
                           <span style={{
                             backgroundColor: '#4CAF50',
@@ -277,16 +239,17 @@ export default function Report({ teamId, onClose }) {
                             padding: '2px 8px',
                             borderRadius: '4px',
                             fontSize: '11px',
-                            fontWeight: 'bold'
+                            fontWeight: 'bold',
+                            flexShrink: 0
                           }}>
                             PROJECT DONE
                           </span>
-                          <span style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                          <span style={{ fontWeight: 'bold', fontSize: '16px', wordBreak: 'break-word' }}>
                             {item.project_name}
                           </span>
                         </div>
                         {item.description && (
-                          <div style={{ fontSize: '13px', color: '#666' }}>
+                          <div style={{ fontSize: '13px', color: '#666', wordBreak: 'break-word' }}>
                             {item.description}
                           </div>
                         )}
@@ -294,11 +257,11 @@ export default function Report({ teamId, onClose }) {
                     ) : (
                       // タスク完了
                       <div>
-                        <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                        <div style={{ fontWeight: 'bold', marginBottom: '5px', wordBreak: 'break-word' }}>
                           {item.task_name}
                         </div>
                         {item.memo && (
-                          <div style={{ fontSize: '13px', color: '#666', marginBottom: '5px' }}>
+                          <div style={{ fontSize: '13px', color: '#666', marginBottom: '5px', wordBreak: 'break-word' }}>
                             {item.memo}
                           </div>
                         )}
@@ -309,7 +272,8 @@ export default function Report({ teamId, onClose }) {
                             backgroundColor: '#f9f9f9',
                             borderLeft: '4px solid #ff69b4',
                             borderRadius: '4px',
-                            fontSize: '14px'
+                            fontSize: '14px',
+                            wordBreak: 'break-word'
                           }}>
                             📝 {item.result_memo}
                           </div>
@@ -326,7 +290,7 @@ export default function Report({ teamId, onClose }) {
                     )}
                   </div>
 
-                  {/* ✅ 削除ボタン（タスクのみ） */}
+                  {/* 削除ボタン（タスクのみ） */}
                   {item.type === 'task' && (
                     <button
                       type="button"
@@ -334,13 +298,9 @@ export default function Report({ teamId, onClose }) {
                         e.stopPropagation()
                         handleDeleteTask(item.id)
                       }}
+                      className="btn btn-danger"
                       style={{
                         padding: '8px 16px',
-                        backgroundColor: '#ff4d4d',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
                         fontSize: '14px',
                         flexShrink: 0
                       }}
@@ -356,26 +316,8 @@ export default function Report({ teamId, onClose }) {
 
         {/* タスク編集モーダル */}
         {selectedTask && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 1001
-          }}>
-            <div style={{
-              backgroundColor: 'white',
-              padding: '30px',
-              borderRadius: '16px',
-              width: '90%',
-              maxWidth: '500px',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
-            }}>
+          <div className="modal-overlay" style={{ zIndex: 1001 }}>
+            <div className="modal-content" style={{ maxWidth: '500px' }}>
               <h3 style={{ marginTop: 0 }}>振り返り & 編集 📝</h3>
 
               {/* タスク名 */}
@@ -387,14 +329,7 @@ export default function Report({ teamId, onClose }) {
                   type="text"
                   value={editingTaskName}
                   onChange={(e) => setEditingTaskName(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box'
-                  }}
+                  className="input-text"
                 />
               </div>
 
@@ -407,15 +342,7 @@ export default function Report({ teamId, onClose }) {
                   value={editingMemo}
                   onChange={(e) => setEditingMemo(e.target.value)}
                   rows="2"
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box',
-                    resize: 'vertical'
-                  }}
+                  className="input-textarea"
                 />
               </div>
 
@@ -429,15 +356,7 @@ export default function Report({ teamId, onClose }) {
                   onChange={(e) => setResultMemo(e.target.value)}
                   rows="4"
                   placeholder="ここに結果や気づきを書いてねん！"
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box',
-                    resize: 'vertical'
-                  }}
+                  className="input-textarea"
                 />
               </div>
 
@@ -445,28 +364,13 @@ export default function Report({ teamId, onClose }) {
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
                 <button
                   onClick={() => setSelectedTask(null)}
-                  style={{
-                    padding: '10px 20px',
-                    backgroundColor: '#f0f0f0',
-                    border: 'none',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    fontWeight: 'bold'
-                  }}
+                  className="btn"
                 >
                   閉じる
                 </button>
                 <button
                   onClick={handleSaveTask}
-                  style={{
-                    padding: '10px 20px',
-                    backgroundColor: '#ff69b4',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    fontWeight: 'bold'
-                  }}
+                  className="btn btn-primary"
                 >
                   保存
                 </button>

@@ -32,16 +32,38 @@
 }
 
 /* ========================================
-   📱 横スクロール防止
+   📱 横スクロール防止（根本修正）
    ======================================== */
 
-.pwa-mode,
-.pwa-mode body,
-.pwa-mode #root {
-    max-width: 100vw;
-    overflow-x: hidden;
+/* html要素の設定（最上位） */
+html.pwa-mode {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: fixed;
 }
 
+/* body要素の設定 */
+body.pwa-mode {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+/* root要素の設定（スクロール可能領域） */
+.pwa-mode #root {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+}
+
+/* 全要素の幅制限 */
 .pwa-mode * {
     max-width: 100%;
     box-sizing: border-box;
@@ -60,30 +82,12 @@
 }
 
 /* ========================================
-   🍎 iOS対応
-   ======================================== */
-
-@supports (-webkit-touch-callout: none) {
-    body.pwa-mode {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-    }
-
-    .pwa-mode #root {
-        overflow-y: auto;
-        height: 100vh;
-        -webkit-overflow-scrolling: touch;
-    }
-}
-
-/* ========================================
    📡 オフラインインジケーター
    ======================================== */
 
 .offline-indicator {
     position: fixed;
-    bottom: 20px;
+    bottom: max(20px, env(safe-area-inset-bottom));
     left: 50%;
     transform: translateX(-50%);
     background: #ff6b6b;

@@ -35,7 +35,7 @@ export default function ProjectList({ teamId, currentProject, onProjectChange, p
       setNewProjectDesc('')
       setNewProjectColor('#FF69B4')
       setShowModal(false)
-      onUpdate()  // ✅ プロジェクト一覧を再取得！
+      onUpdate()
       alert('プロジェクト作成したよ！🚀')
     } else {
       alert('エラー: ' + error.message)
@@ -45,70 +45,38 @@ export default function ProjectList({ teamId, currentProject, onProjectChange, p
   return (
     <div>
       {/* プロジェクトタブ */}
-      <div style={{
-        display: 'flex',
-        gap: '10px',
-        overflowX: 'auto',
-        padding: '10px 0',
-        borderBottom: '2px solid #f0f0f0',
-        marginBottom: '20px'
-      }}>
-        {/* ALL タブ */}
-        <button
-          onClick={() => onProjectChange(null)}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: !currentProject ? '#ff69b4' : '#f0f0f0',
-            color: !currentProject ? 'white' : '#555',
-            border: 'none',
-            borderRadius: '20px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            fontSize: '14px',
-            whiteSpace: 'nowrap'
-          }}
-        >
-          ALL
-        </button>
-
-        {/* プロジェクトタブ */}
-        {projects.map(project => (
+      <div className="project-tabs-container">
+        <div className="project-tabs">
+          {/* ALL タブ */}
           <button
-            key={project.id}
-            onClick={() => onProjectChange(project.id)}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: currentProject === project.id ? '#ff69b4' : '#f0f0f0',
-              color: currentProject === project.id ? 'white' : '#555',
-              border: 'none',
-              borderRadius: '20px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              fontSize: '14px',
-              whiteSpace: 'nowrap',
-              borderBottom: `3px solid ${project.color_code}`
-            }}
+            onClick={() => onProjectChange(null)}
+            className={`project-tab ${!currentProject ? 'active' : ''}`}
           >
-            {project.project_name}
+            ALL
           </button>
-        ))}
 
-        {/* プロジェクト追加ボタン */}
-        <button
-          onClick={() => setShowModal(true)}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#f0f0f0',
-            color: '#555',
-            border: '1px dashed #999',
-            borderRadius: '20px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            whiteSpace: 'nowrap'
-          }}
-        >
-          ＋ プロジェクト
-        </button>
+          {/* プロジェクトタブ */}
+          {projects.map(project => (
+            <button
+              key={project.id}
+              onClick={() => onProjectChange(project.id)}
+              className={`project-tab ${currentProject === project.id ? 'active' : ''}`}
+              style={{
+                borderBottom: `3px solid ${project.color_code}`
+              }}
+            >
+              {project.project_name}
+            </button>
+          ))}
+
+          {/* プロジェクト追加ボタン */}
+          <button
+            onClick={() => setShowModal(true)}
+            className="project-tab project-tab-add"
+          >
+            ＋ プロジェクト
+          </button>
+        </div>
       </div>
 
       {/* プロジェクト作成モーダル */}

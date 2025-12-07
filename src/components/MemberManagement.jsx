@@ -82,29 +82,8 @@ export default function MemberManagement({ teamId, onClose }) {
   }
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 1000,
-      padding: '20px'
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '30px',
-        borderRadius: '16px',
-        width: '100%',
-        maxWidth: '600px',
-        maxHeight: '90vh',
-        overflowY: 'auto',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
-      }}>
+    <div className="modal-overlay">
+      <div className="modal-content">
         <h2 style={{ marginTop: 0, marginBottom: '20px' }}>メンバー管理 👥</h2>
 
         {/* メンバー追加フォーム */}
@@ -119,14 +98,7 @@ export default function MemberManagement({ teamId, onClose }) {
               onChange={(e) => setNewMemberName(e.target.value)}
               placeholder="例：山田 太郎"
               required
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                fontSize: '16px',
-                boxSizing: 'border-box'
-              }}
+              className="input-text"
             />
           </div>
 
@@ -140,14 +112,7 @@ export default function MemberManagement({ teamId, onClose }) {
               onChange={(e) => setNewMemberEmail(e.target.value)}
               placeholder="例：yamada@example.com"
               required
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                fontSize: '16px',
-                boxSizing: 'border-box'
-              }}
+              className="input-text"
             />
           </div>
 
@@ -167,7 +132,8 @@ export default function MemberManagement({ teamId, onClose }) {
                     borderRadius: '50%',
                     cursor: 'pointer',
                     border: newMemberColor === color ? '3px solid #333' : '3px solid white',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                    flexShrink: 0
                   }}
                 />
               ))}
@@ -176,17 +142,8 @@ export default function MemberManagement({ teamId, onClose }) {
 
           <button
             type="submit"
-            style={{
-              width: '100%',
-              padding: '12px',
-              backgroundColor: '#ff69b4',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              cursor: 'pointer'
-            }}
+            className="btn btn-primary"
+            style={{ width: '100%' }}
           >
             メンバー追加 ➕
           </button>
@@ -213,29 +170,28 @@ export default function MemberManagement({ teamId, onClose }) {
                   marginBottom: '10px'
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
                   <div style={{
                     width: '30px',
                     height: '30px',
                     borderRadius: '50%',
-                    backgroundColor: member.color
+                    backgroundColor: member.color,
+                    flexShrink: 0
                   }} />
-                  <div>
-                    <div style={{ fontWeight: 'bold' }}>{member.name}</div>
-                    <div style={{ fontSize: '12px', color: '#999' }}>{member.email}</div>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ fontWeight: 'bold', wordBreak: 'break-word' }}>{member.name}</div>
+                    <div style={{ fontSize: '12px', color: '#999', wordBreak: 'break-all' }}>{member.email}</div>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => deleteMember(member.id)}
+                  className="btn btn-danger"
                   style={{
                     padding: '6px 12px',
-                    backgroundColor: '#ff4d4d',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '12px'
+                    fontSize: '12px',
+                    flexShrink: 0,
+                    marginLeft: '10px'
                   }}
                 >
                   削除
@@ -249,16 +205,9 @@ export default function MemberManagement({ teamId, onClose }) {
         <button
           type="button"
           onClick={onClose}
+          className="btn"
           style={{
             width: '100%',
-            padding: '12px',
-            backgroundColor: '#f0f0f0',
-            color: '555',
-            border: 'none',
-            borderRadius: '8px',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            cursor: 'pointer',
             marginTop: '20px'
           }}
         >

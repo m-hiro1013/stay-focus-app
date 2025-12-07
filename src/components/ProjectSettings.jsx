@@ -138,27 +138,8 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
 
   return (
     <>
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1000,
-        padding: '20px'
-      }}>
-        <div style={{
-          backgroundColor: 'white',
-          padding: '30px',
-          borderRadius: '16px',
-          width: '90%',
-          maxWidth: '500px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
-        }}>
+      <div className="modal-overlay">
+        <div className="modal-content" style={{ maxWidth: '500px' }}>
           <h2 style={{ marginTop: 0, marginBottom: '20px' }}>プロジェクト設定 ⚙️</h2>
 
           {/* プロジェクト名 */}
@@ -170,14 +151,7 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
               type="text"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                fontSize: '16px',
-                boxSizing: 'border-box'
-              }}
+              className="input-text"
             />
           </div>
 
@@ -191,15 +165,7 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
               onChange={(e) => setDescription(e.target.value)}
               rows="3"
               placeholder="プロジェクトの説明..."
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                fontSize: '16px',
-                boxSizing: 'border-box',
-                resize: 'vertical'
-              }}
+              className="input-textarea"
             />
           </div>
 
@@ -220,7 +186,8 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
                     borderRadius: '50%',
                     cursor: 'pointer',
                     border: colorCode === color ? '3px solid #333' : '3px solid white',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                    flexShrink: 0
                   }}
                 />
               ))}
@@ -238,13 +205,10 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
               <button
                 type="button"
                 onClick={handleComplete}
+                className="btn"
                 style={{
-                  padding: '12px 24px',
                   backgroundColor: '#4CAF50',
                   color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
                   fontWeight: 'bold',
                   fontSize: '16px'
                 }}
@@ -253,18 +217,16 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
               </button>
             )}
 
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 onClick={handleDelete}
+                className="btn"
                 style={{
                   flex: 1,
-                  padding: '12px 24px',
-                  backgroundColor: 'white',
+                  minWidth: '120px',
                   color: '#ff4d4d',
                   border: '1px solid #ff4d4d',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
                   fontWeight: 'bold'
                 }}
               >
@@ -273,14 +235,12 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
               <button
                 type="button"
                 onClick={handleArchive}
+                className="btn"
                 style={{
                   flex: 1,
-                  padding: '12px 24px',
+                  minWidth: '120px',
                   backgroundColor: '#FF9800',
                   color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
                   fontWeight: 'bold'
                 }}
               >
@@ -288,19 +248,14 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
               </button>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 onClick={onClose}
+                className="btn"
                 style={{
                   flex: 1,
-                  padding: '12px 24px',
-                  backgroundColor: '#f0f0f0',
-                  color: '#555',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold'
+                  minWidth: '120px'
                 }}
               >
                 キャンセル
@@ -308,14 +263,10 @@ export default function ProjectSettings({ project, teamId, onClose, onUpdate }) 
               <button
                 type="button"
                 onClick={handleSave}
+                className="btn btn-primary"
                 style={{
                   flex: 1,
-                  padding: '12px 24px',
-                  backgroundColor: '#ff69b4',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
+                  minWidth: '120px',
                   fontWeight: 'bold'
                 }}
               >

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'  // 🔥 追加
+import { createPortal } from 'react-dom'
 import { supabase } from '../supabase'
 
 export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
@@ -41,7 +41,7 @@ export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
         .select('*')
         .eq('team_id', teamId)
         .eq('is_archived', false)
-        .eq('is_completed', false)  // ✅ 完了済みも除外！
+        .eq('is_completed', false)
 
       if (data) {
         setProjects(data)
@@ -97,29 +97,8 @@ export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
   }
 
   return createPortal(
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 1000,
-      padding: '20px'
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '30px',
-        borderRadius: '16px',
-        width: '100%',
-        maxWidth: '600px',
-        maxHeight: '90vh',
-        overflowY: 'auto',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
-      }}>
+    <div className="modal-overlay">
+      <div className="modal-content" style={{ maxWidth: '600px' }}>
         <h2 style={{ marginTop: 0, marginBottom: '20px' }}>タスク詳細 📝</h2>
 
         {/* タスク名 */}
@@ -131,14 +110,7 @@ export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
             type="text"
             value={taskName}
             onChange={(e) => setTaskName(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              fontSize: '16px',
-              boxSizing: 'border-box'
-            }}
+            className="input-text"
           />
         </div>
 
@@ -152,15 +124,7 @@ export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
             onChange={(e) => setMemo(e.target.value)}
             rows="3"
             placeholder="詳細なメモを入力..."
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              fontSize: '16px',
-              boxSizing: 'border-box',
-              resize: 'vertical'
-            }}
+            className="input-textarea"
           />
         </div>
 
@@ -172,14 +136,7 @@ export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
           <select
             value={selectedProject}
             onChange={(e) => setSelectedProject(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              fontSize: '16px',
-              boxSizing: 'border-box'
-            }}
+            className="input-select"
           >
             <option value="">プロジェクトなし</option>
             {projects.map(project => (
@@ -198,14 +155,7 @@ export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
           <select
             value={priorityTimeFrame}
             onChange={(e) => setPriorityTimeFrame(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              fontSize: '16px',
-              boxSizing: 'border-box'
-            }}
+            className="input-select"
           >
             {timeFrames.map(tf => (
               <option key={tf} value={tf}>{tf}</option>
@@ -218,36 +168,24 @@ export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
           <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
             期日
           </label>
-          <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '10px', flexWrap: 'wrap' }}>
             <input
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
-              style={{
-                flex: 1,
-                padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                fontSize: '16px'
-              }}
+              className="input-text"
+              style={{ flex: '1 1 auto', minWidth: '140px' }}
             />
             <select
               value={dueTime}
               onChange={(e) => setDueTime(e.target.value)}
               onFocus={(e) => {
-                // ✅ 初回クリック時のみ、空なら17:00にする
                 if (dueTime === '') {
                   setDueTime('17:00')
                 }
               }}
-              style={{
-                flex: 1,
-                padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                fontSize: '16px',
-                backgroundColor: 'white'
-              }}
+              className="input-select"
+              style={{ flex: '1 1 auto', minWidth: '100px' }}
             >
               <option value="">時間なし</option>
               {Array.from({ length: 48 }, (_, i) => {
@@ -269,15 +207,12 @@ export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
                 setDueDate('')
                 setDueTime('')
               }}
+              className="btn"
               style={{
-                padding: '8px 16px',
+                width: '100%',
                 backgroundColor: '#f0f0f0',
                 color: '#666',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                width: '100%'
+                border: '1px solid #ddd'
               }}
             >
               🗑️ 期日をクリア
@@ -286,7 +221,7 @@ export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
         </div>
 
         {/* 重要マーク・ピン留め */}
-        <div style={{ marginBottom: '20px', display: 'flex', gap: '20px' }}>
+        <div style={{ marginBottom: '20px', display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
             <input
               type="checkbox"
@@ -316,7 +251,7 @@ export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
           </label>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
             {assignees.length === 0 ? (
-              <p style={{ color: '#999', fontSize: '14px' }}>メンバーがいません</p>
+              <p style={{ color: '#999', fontSize: '14px', margin: 0 }}>メンバーがいません</p>
             ) : (
               assignees.map(member => (
                 <label
@@ -330,7 +265,9 @@ export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
                     color: selectedAssignees.includes(member.id) ? 'white' : '#555',
                     borderRadius: '20px',
                     cursor: 'pointer',
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    transition: 'all 0.2s',
+                    flexShrink: 0
                   }}
                 >
                   <input
@@ -343,7 +280,8 @@ export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
                     width: '12px',
                     height: '12px',
                     borderRadius: '50%',
-                    backgroundColor: member.color
+                    backgroundColor: member.color,
+                    flexShrink: 0
                   }} />
                   {member.name}
                 </label>
@@ -353,38 +291,24 @@ export default function TaskDetailModal({ task, onClose, onUpdate, teamId }) {
         </div>
 
         {/* ボタン */}
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
           <button
             onClick={onClose}
-            style={{
-              padding: '12px 24px',
-              backgroundColor: '#f0f0f0',
-              color: '#555',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
+            className="btn"
+            style={{ flex: '1 1 auto', minWidth: '100px' }}
           >
             キャンセル
           </button>
           <button
             onClick={handleSave}
-            style={{
-              padding: '12px 24px',
-              backgroundColor: '#ff69b4',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
+            className="btn btn-primary"
+            style={{ flex: '1 1 auto', minWidth: '100px' }}
           >
             保存
           </button>
         </div>
       </div>
     </div>,
-    document.body  // 🔥 追加
+    document.body
   )
 }
